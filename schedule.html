@@ -4,252 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Navigator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ecu-purple: #592A8A;
-            --ecu-purple-dark: #421E68;
-            --ecu-gold: #FDC82F;
-            --bg-canvas: #FAFAFC;
-            --surface: #FFFFFF;
-            --text-primary: #0F172A;
-            --text-secondary: #475569;
-            --text-muted: #94A3B8;
-            --border-subtle: #E2E8F0;
-            --radius-card: 16px;
-            --radius-btn: 10px;
-            --shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.03), 0 4px 12px rgba(15, 23, 42, 0.04);
-            --shadow-active: 0 4px 12px rgba(89, 42, 138, 0.15);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background-color: var(--bg-canvas); 
-            color: var(--text-primary); 
-            min-height: 100vh;
-            padding: 32px 16px;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .app-container {
-            max-width: 520px;
-            margin: 0 auto;
-        }
-
-        header {
-            margin-bottom: 24px;
-            text-align: left;
-        }
-
-        .brand-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--ecu-purple);
-            background: rgba(89, 42, 138, 0.08);
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-bottom: 8px;
-        }
-
-        .brand-badge::before {
-            content: "";
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: var(--ecu-gold);
-        }
-
-        h1 { 
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-        } 
-
-        .day-selector { 
-            display: grid; 
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px; 
-            background: rgba(226, 232, 240, 0.5);
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 24px; 
-            border: 1px solid var(--border-subtle);
-        }
-
-        .day-btn { 
-            border: none; 
-            padding: 10px 0;
-            border-radius: 8px; 
-            background: transparent; 
-            color: var(--text-secondary); 
-            font-weight: 600; 
-            font-size: 0.875rem;
-            cursor: pointer; 
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .day-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .day-btn.active { 
-            background-color: var(--surface); 
-            color: var(--ecu-purple); 
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
-            font-weight: 700;
-        }
-
-        .class-card { 
-            background: var(--surface); 
-            border-radius: var(--radius-card); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f4f4f9; 
+            color: #333; 
+            margin: 0; 
             padding: 20px; 
-            margin-bottom: 16px; 
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-subtle);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .class-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .class-time { 
-            font-size: 0.8125rem; 
-            color: var(--text-secondary); 
-            font-weight: 600; 
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #F1F5F9;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .class-title { 
-            font-size: 1.125rem; 
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1.35;
-            margin-bottom: 12px;
-        }
-
-        .class-location { 
-            font-size: 0.875rem; 
-            color: var(--text-secondary);
+        h1 { 
+            text-align: center; 
+            color: #592A8A; /* ECU Purple */
+            margin-bottom: 25px;
+        } 
+        .day-selector { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 10px; 
             margin-bottom: 20px; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            padding-bottom: 10px; 
         }
-
-        .class-location svg {
-            color: var(--text-muted);
-            flex-shrink: 0;
+        .day-btn { 
+            flex: 1; 
+            min-width: 60px; 
+            padding: 12px 10px; 
+            border: none; 
+            border-radius: 8px; 
+            background-color: #e0e0e0; 
+            color: #333; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.2s;
         }
-
+        .day-btn.active { 
+            background-color: #FDC82F; /* ECU Gold */
+            color: #333; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .class-card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 18px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            border-left: 6px solid #592A8A; 
+        }
+        .class-time { 
+            font-size: 0.9em; 
+            color: #666; 
+            margin-bottom: 5px; 
+            font-weight: 700; 
+            text-transform: uppercase;
+        }
+        .class-title { 
+            font-size: 1.25em; 
+            margin: 0 0 8px 0; 
+        }
+        .class-location { 
+            font-size: 0.95em; 
+            color: #444;
+            margin-bottom: 15px; 
+        }
         .nav-btn { 
-            display: inline-flex; 
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            display: block; 
             width: 100%; 
-            padding: 12px 16px; 
-            background-color: var(--ecu-purple); 
+            padding: 14px; 
+            text-align: center; 
+            background-color: #592A8A; 
             color: white; 
             text-decoration: none; 
-            border-radius: var(--radius-btn); 
-            font-weight: 600; 
-            font-size: 0.875rem;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 8px; 
+            font-weight: bold; 
+            box-sizing: border-box;
         }
-
-        .nav-btn:hover {
-            background-color: var(--ecu-purple-dark);
-            box-shadow: var(--shadow-active);
-        }
-
-        .nav-btn svg {
-            transition: transform 0.2s ease;
-        }
-
-        .nav-btn:hover svg {
-            transform: translateX(2px);
-        }
-
         .nav-btn.disabled { 
-            background-color: #F1F5F9; 
-            color: var(--text-muted);
+            background-color: #ccc; 
+            color: #666;
             pointer-events: none;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 48px 24px;
-            background: var(--surface);
-            border-radius: var(--radius-card);
-            border: 1px dashed var(--border-subtle);
-            color: var(--text-secondary);
-        }
-
-        .empty-state h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .empty-state p {
-            font-size: 0.875rem;
-            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <header>
-            <div class="brand-badge">ECU Schedule</div>
-            <h1>Class Navigator</h1>
-        </header>
-        
-        <nav class="day-selector" id="daySelector" aria-label="Select day of the week">
-            <button class="day-btn" onclick="selectDay('Monday')">Mon</button>
-            <button class="day-btn" onclick="selectDay('Tuesday')">Tue</button>
-            <button class="day-btn" onclick="selectDay('Wednesday')">Wed</button>
-            <button class="day-btn" onclick="selectDay('Thursday')">Thu</button>
-            <button class="day-btn" onclick="selectDay('Friday')">Fri</button>
-        </nav>
-
-        <main id="scheduleContainer" aria-live="polite"></main>
+    <h1>Class Navigator</h1>
+    
+    <div class="day-selector" id="daySelector">
+        <button class="day-btn" onclick="selectDay('Monday')">Mon</button>
+        <button class="day-btn" onclick="selectDay('Tuesday')">Tue</button>
+        <button class="day-btn" onclick="selectDay('Wednesday')">Wed</button>
+        <button class="day-btn" onclick="selectDay('Thursday')">Thu</button>
+        <button class="day-btn" onclick="selectDay('Friday')">Fri</button>
     </div>
 
+    <div id="scheduleContainer"></div>
+
     <script>
+        // Navigation defaults
         const origin = "Greene Hall, East Carolina University";
         
+        // Course Database
         const schedule = {
             Monday: [
                 { time: "09:00 AM - 09:50 AM", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" }
@@ -281,6 +134,7 @@
         }
 
         function selectDay(day) {
+            // Update active button styles
             const buttons = document.querySelectorAll('.day-btn');
             buttons.forEach(btn => {
                 if (btn.innerText.startsWith(day.substring(0,3))) {
@@ -295,46 +149,32 @@
             
             const classes = schedule[day] || [];
             if (classes.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No classes scheduled</h3>
-                        <p>Enjoy your free time!</p>
-                    </div>
-                `;
+                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 30px;">No classes today! 🎉</p>';
                 return;
             }
             
             classes.forEach(cls => {
                 const mapLink = getMapLink(cls.building);
-                const card = document.createElement('article');
+                const card = document.createElement('div');
                 card.className = 'class-card';
                 card.innerHTML = `
-                    <div class="card-header">
-                        <div class="class-time">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            ${cls.time}
-                        </div>
-                    </div>
+                    <div class="class-time">${cls.time}</div>
                     <h2 class="class-title">${cls.title}</h2>
-                    <div class="class-location">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        ${cls.room}
-                    </div>
+                    <div class="class-location">📍 ${cls.room}</div>
                     ${mapLink 
-                        ? `<a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="nav-btn">
-                            Get Walking Directions
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                           </a>`
-                        : `<span class="nav-btn disabled">Location Pending</span>`
+                        ? `<a href="${mapLink}" target="_blank" class="nav-btn">🚶‍♂️ Get Directions</a>`
+                        : `<span class="nav-btn disabled">Location TBD</span>`
                     }
                 `;
                 container.appendChild(card);
             });
         }
 
+        // Auto-select the current day of the week
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         let today = days[new Date().getDay()];
         
+        // If it's the weekend, default to Monday
         if (today === 'Sunday' || today === 'Saturday') {
             today = 'Monday';
         }
