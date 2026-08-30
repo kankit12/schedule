@@ -29,6 +29,20 @@
             --alert-text: #B91C1C;
         }
 
+        /* Dark Mode Theme Variables */
+        body.dark-mode {
+            --bg-canvas: #0F172A;
+            --surface: #1E293B;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border-subtle: #334155;
+            --ecu-purple-light: rgba(139, 92, 246, 0.15);
+            --alert-bg: rgba(185, 28, 28, 0.2);
+            --alert-text: #FCA5A5;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -42,9 +56,9 @@
             min-height: 100vh;
             padding: 24px 16px 40px;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Desktop Layout Expansion */
         .layout-wrapper {
             display: flex;
             flex-direction: column;
@@ -78,6 +92,27 @@
             justify-content: space-between;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle-btn {
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-subtle);
+        }
+
         .brand-badge {
             display: inline-flex;
             align-items: center;
@@ -108,7 +143,7 @@
             letter-spacing: -0.03em;
         }
 
-        /* Status Banner */
+        /* Banner */
         .status-banner {
             background: linear-gradient(135deg, var(--ecu-purple) 0%, var(--ecu-purple-dark) 100%);
             color: white;
@@ -180,7 +215,6 @@
             font-weight: 500;
         }
 
-        /* Progress Bar (In Class) */
         .progress-container {
             margin-top: 16px;
             background: rgba(255, 255, 255, 0.2);
@@ -234,8 +268,6 @@
             transition: background 0.2s;
         }
 
-        .utility-link:hover { background: #E2E8F0; }
-
         .btn-notify {
             width: 100%;
             padding: 12px;
@@ -247,15 +279,17 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        
-        .btn-notify:hover { background: rgba(89, 42, 138, 0.15); }
 
-        /* Day Selector Navigation */
+        body.dark-mode .btn-notify {
+            color: #C084FC;
+        }
+
+        /* Day Selector */
         .day-selector { 
             display: grid; 
             grid-template-columns: repeat(5, 1fr);
             gap: 6px; 
-            background: rgba(226, 232, 240, 0.6);
+            background: var(--surface);
             padding: 4px;
             border-radius: 14px;
             margin-bottom: 20px; 
@@ -275,9 +309,9 @@
         }
 
         .day-btn.active { 
-            background-color: var(--surface); 
-            color: var(--ecu-purple); 
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+            background-color: var(--ecu-purple); 
+            color: white; 
+            box-shadow: 0 2px 8px rgba(89, 42, 138, 0.3);
         }
 
         /* Class Cards */
@@ -310,7 +344,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #F1F5F9;
+            background: var(--bg-canvas);
             padding: 4px 10px;
             border-radius: 6px;
         }
@@ -361,17 +395,45 @@
             font-weight: 500;
         }
 
-        .class-notes {
+        /* Interactive Checklist for Labs */
+        .checklist-container {
             background: var(--alert-bg);
             color: var(--alert-text);
-            padding: 10px 12px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .checklist-title {
+            font-size: 0.8125rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checklist-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 0.8125rem;
             font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            gap: 8px;
-            align-items: flex-start;
+            cursor: pointer;
+        }
+
+        .checklist-item input {
+            accent-color: var(--ecu-purple);
+            width: 16px;
+            height: 16px;
         }
 
         .nav-btn { 
@@ -405,7 +467,6 @@
 <body>
 
     <div class="layout-wrapper">
-        <!-- Sidebar for Desktop / Bottom for Mobile -->
         <aside class="sidebar">
             <div class="utility-card">
                 <div class="utility-header">
@@ -424,14 +485,17 @@
             </div>
         </aside>
 
-        <!-- Main App Area -->
         <div class="app-container">
             <header>
                 <h1>Class Navigator</h1>
-                <div class="brand-badge">ECU</div>
+                <div class="header-actions">
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">
+                        🌙 Dark
+                    </button>
+                    <div class="brand-badge">ECU</div>
+                </div>
             </header>
 
-            <!-- Live Tracker Banner -->
             <div class="status-banner">
                 <div class="status-header">
                     <span class="status-tag" id="statusTag">Schedule Tracker</span>
@@ -445,7 +509,6 @@
                 </div>
             </div>
             
-            <!-- Day Picker -->
             <nav class="day-selector" id="daySelector">
                 <button class="day-btn" onclick="userSelectDay('Monday')">Mon</button>
                 <button class="day-btn" onclick="userSelectDay('Tuesday')">Tue</button>
@@ -454,7 +517,6 @@
                 <button class="day-btn" onclick="userSelectDay('Friday')">Fri</button>
             </nav>
 
-            <!-- Schedule List -->
             <main id="scheduleContainer" aria-live="polite"></main>
         </div>
     </div>
@@ -462,10 +524,11 @@
     <script>
         const origin = "Greene Hall, East Carolina University";
         
-        // Added Notes for Chem Lab
+        // Accurate Schedule matching Schedule.pdf
         const schedule = {
             Monday: [
-                { id: "mon-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" }
+                { id: "mon-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" },
+                { id: "mon-2", time: "02:00 PM - 04:50 PM", start: "14:00", end: "16:50", title: "BIOL 1101: Principles of Biology Lab I", room: "Sci & Tech, 00339", building: "Science and Technology Building, East Carolina University" }
             ],
             Tuesday: [
                 { id: "tue-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "HLTH 1000: Health in Modern Society", room: "Brewster, 0C302", building: "Brewster Building, East Carolina University" },
@@ -475,7 +538,7 @@
             ],
             Wednesday: [
                 { id: "wed-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" },
-                { id: "wed-2", time: "11:00 AM - 01:50 PM", start: "11:00", end: "13:50", title: "CHEM 1151: General Chemistry Lab I", room: "Sci & Tech, 00432", building: "Science and Technology Building, East Carolina University", notes: "Mandatory: Bring lab goggles, lab coat, long pants, and closed-toe shoes." },
+                { id: "wed-2", time: "11:00 AM - 01:50 PM", start: "11:00", end: "13:50", title: "CHEM 1151: General Chemistry Lab I", room: "Sci & Tech, 00432", building: "Science and Technology Building, East Carolina University", checklist: ["Safety Goggles", "Lab Coat", "Long Pants", "Closed-toe Shoes"] },
                 { id: "wed-3", time: "03:30 PM - 06:30 PM", start: "15:30", end: "18:30", title: "HNRS 2002: Survey of Health Professions", room: "Health Sciences Campus", building: "Health Sciences Campus, East Carolina University" }
             ],
             Thursday: [
@@ -490,7 +553,20 @@
         let activeDay = "";
         let isUserSelected = false;
         let activeClassId = null;
-        let notifiedClasses = new Set(); // Prevent spamming notifications
+        let notifiedClasses = new Set();
+
+        // Dark Mode Logic
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeBtn').innerHTML = isDark ? '☀️ Light' : '🌙 Dark';
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeBtn').innerHTML = '☀️ Light';
+        }
 
         function getMapLink(destination) {
             if (!destination) return null;
@@ -526,7 +602,6 @@
         function getNextClassStatus(now) {
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             
-            // Look ahead up to 7 days to find the next class (handles weekends)
             for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
                 const checkDate = new Date(now);
                 checkDate.setDate(now.getDate() + dayOffset);
@@ -578,7 +653,6 @@
                 timerElem.textContent = formatHMS(secsRemaining);
                 subtextElem.textContent = `Ends at ${result.cls.time.split('-')[1].trim()}`;
                 
-                // Progress Bar Math
                 const totalDuration = result.targetTime - result.startTime;
                 const elapsed = now - result.startTime;
                 const percentage = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
@@ -589,7 +663,6 @@
             } else {
                 activeClassId = null;
                 
-                // Notifications: Alert 15 minutes before class
                 if (secsRemaining <= 900 && secsRemaining > 890 && !notifiedClasses.has(result.cls.id)) {
                     if (Notification.permission === 'granted') {
                         new Notification('Class Starting Soon', {
@@ -612,7 +685,6 @@
                 progContainer.style.display = "none";
             }
 
-            // Sync day view if not touched by user
             const todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()];
             if (!isUserSelected) {
                 const defaultDay = (todayName === 'Saturday' || todayName === 'Sunday') ? 'Monday' : todayName;
@@ -689,10 +761,19 @@
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                         ${cls.room}
                     </div>
-                    ${cls.notes ? `
-                    <div class="class-notes">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0; margin-top:2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                        ${cls.notes}
+                    ${cls.checklist ? `
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Lab Gear Checklist
+                        </div>
+                        <div class="checklist-items">
+                            ${cls.checklist.map(item => `
+                                <label class="checklist-item">
+                                    <input type="checkbox"> ${item}
+                                </label>
+                            `).join('')}
+                        </div>
                     </div>` : ''}
                     ${mapLink 
                         ? `<a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="nav-btn">
