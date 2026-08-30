@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Class Navigator</title>
+    <title>Class Navigator - ECU</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- PWA Web App Manifest via Data URI -->
+    <link rel="manifest" href='data:application/manifest+json,{
+        "name": "ECU Class Navigator",
+        "short_name": "Navigator",
+        "start_url": "./",
+        "display": "standalone",
+        "background_color": "#F8FAFC",
+        "theme_color": "#592A8A",
+        "icons": [{"src": "https://via.placeholder.com/192.png", "sizes": "192x192", "type": "image/png"}]
+    }'>
+
     <style>
         :root {
             --ecu-purple: #592A8A;
@@ -165,7 +177,7 @@
             transition: all 0.3s ease;
         }
 
-        .status-banner.sprint-alert {
+        .status-banner.sprint-alert, .status-banner.rain-alert {
             background: linear-gradient(135deg, #7C2D12 0%, #451A03 100%);
             border: 2px solid var(--ecu-gold);
         }
@@ -235,7 +247,7 @@
             transition: width 1s linear;
         }
 
-        /* Sidebar Utilities & Deadline Tracker */
+        /* Sidebar Utilities */
         .utility-card {
             background: var(--surface);
             border-radius: var(--radius-card);
@@ -271,7 +283,7 @@
             margin-bottom: 8px;
         }
 
-        .btn-notify {
+        .utility-btn {
             width: 100%;
             padding: 12px;
             background: var(--ecu-purple-light);
@@ -280,84 +292,26 @@
             border-radius: var(--radius-btn);
             font-weight: 700;
             cursor: pointer;
-        }
-
-        body.dark-mode .btn-notify { color: #C084FC; }
-
-        /* Deadline Tracker Form & List */
-        .add-task-form {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .task-input, .task-date {
-            padding: 10px 12px;
-            border-radius: var(--radius-btn);
-            border: 1px solid var(--border-subtle);
-            background: var(--bg-canvas);
-            color: var(--text-primary);
+            margin-bottom: 8px;
             font-family: inherit;
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
+            transition: opacity 0.2s;
         }
+        .utility-btn:hover { opacity: 0.85; }
 
-        .btn-add-task {
-            padding: 10px;
-            background: var(--ecu-purple);
-            color: white;
-            border: none;
-            border-radius: var(--radius-btn);
-            font-weight: 700;
-            font-size: 0.8125rem;
-            cursor: pointer;
-        }
+        body.dark-mode .utility-btn { color: #C084FC; }
 
-        .task-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 240px;
-            overflow-y: auto;
-        }
-
-        .task-item {
+        .weather-info {
+            font-size: 0.875rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px;
+            padding: 10px 12px;
             background: var(--bg-canvas);
-            border-radius: 10px;
-            font-size: 0.8125rem;
+            border-radius: var(--radius-btn);
+            margin-bottom: 8px;
         }
-
-        .task-item.completed span {
-            text-decoration: line-through;
-            opacity: 0.5;
-        }
-
-        .task-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .task-date-tag {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .delete-task-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        .delete-task-btn:hover { color: var(--alert-text); }
 
         /* Day Selector */
         .day-selector { 
@@ -561,18 +515,31 @@
 
     <div class="layout-wrapper">
         <aside class="sidebar">
+            <!-- Weather & GPS Utilities -->
             <div class="utility-card">
                 <div class="utility-header">
-                    <span>📝 Deadline Tracker</span>
+                    <span>⛅ Live Conditions</span>
                 </div>
-                <form class="add-task-form" onsubmit="addAssignment(event)">
-                    <input type="text" id="taskTitle" class="task-input" placeholder="e.g. Chem Lab Report" required>
-                    <input type="date" id="taskDate" class="task-date" required>
-                    <button type="submit" class="btn-add-task">+ Add Item</button>
-                </form>
-                <ul class="task-list" id="taskList"></ul>
+                <div class="weather-info" id="weatherWidget">
+                    <span>Loading weather...</span>
+                </div>
+                <div class="weather-info" id="gpsWidget" style="font-size:0.75rem; color:var(--text-secondary);">
+                    <span>📍 GPS Distance: Not tracked</span>
+                </div>
             </div>
 
+            <!-- Calendar & Data Portability -->
+            <div class="utility-card">
+                <div class="utility-header">
+                    <span>⚙️ Data & Sync</span>
+                </div>
+                <button class="utility-btn" onclick="exportICS()">📅 Export .ics Calendar</button>
+                <button class="utility-btn" onclick="exportJSONBackup()">💾 Backup Settings (JSON)</button>
+                <button class="utility-btn" onclick="document.getElementById('importFile').click()">📂 Restore JSON</button>
+                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importJSONBackup(event)">
+            </div>
+
+            <!-- Campus Links -->
             <div class="utility-card">
                 <div class="utility-header">
                     <span>📍 Campus Utilities</span>
@@ -585,7 +552,7 @@
                     Greenville Weather
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 </a>
-                <button class="btn-notify" onclick="enableNotifications()">Enable Push Alerts</button>
+                <button class="utility-btn" onclick="enableNotifications()">Enable Push Alerts</button>
             </div>
         </aside>
 
@@ -630,8 +597,17 @@
 
     <script>
         const origin = "Greene Hall, East Carolina University";
+        const originCoords = { lat: 35.6074, lon: -77.3661 };
+
+        // Building Lat/Long approximate coordinates for live GPS distance calculation
+        const buildingCoords = {
+            "Science and Technology Building, East Carolina University": { lat: 35.6085, lon: -77.3650 },
+            "Brewster Building, East Carolina University": { lat: 35.6092, lon: -77.3705 },
+            "Austin Building, East Carolina University": { lat: 35.6078, lon: -77.3680 },
+            "Rawl Building, East Carolina University": { lat: 35.6080, lon: -77.3695 },
+            "Health Sciences Campus, East Carolina University": { lat: 35.5870, lon: -77.3820 }
+        };
         
-        // Estimated walking mins from Greene Hall (Normal vs Sprint)
         const walkTimes = {
             "Science and Technology Building, East Carolina University": { normal: 8, sprint: 4 },
             "Brewster Building, East Carolina University": { normal: 6, sprint: 3 },
@@ -669,10 +645,64 @@
         let isUserSelected = false;
         let activeClassId = null;
         let isSprintMode = localStorage.getItem('sprintMode') === 'true';
-        let assignments = JSON.parse(localStorage.getItem('assignments')) || [
-            { id: 1, title: "Chem 1151 Pre-Lab", date: "2026-09-02", completed: false },
-            { id: 2, title: "Biology Chapter 1 Quiz", date: "2026-09-04", completed: false }
-        ];
+        let currentPrecipitation = 0;
+
+        // Register Service Worker for Offline Capabilities
+        if ('serviceWorker' in navigator) {
+            const swCode = `self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`;
+            const swBlob = new Blob([swCode], { type: 'text/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+        }
+
+        // Fetch Open-Meteo Weather Data
+        async function fetchWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6127&longitude=-77.3663&current=temperature_2m,precipitation,weather_code');
+                const data = await res.json();
+                const tempF = Math.round((data.current.temperature_2m * 9/5) + 32);
+                currentPrecipitation = data.current.precipitation;
+                
+                let conditionStr = `${tempF}°F, Clear`;
+                if (currentPrecipitation > 0) conditionStr = `${tempF}°F, 🌧️ Raining`;
+                
+                document.getElementById('weatherWidget').innerHTML = `<span>Greenville Weather</span><strong>${conditionStr}</strong>`;
+            } catch (e) {
+                document.getElementById('weatherWidget').innerHTML = `<span>Greenville Weather</span><strong>Unavailable</strong>`;
+            }
+        }
+        fetchWeather();
+
+        // Live GPS Distance Calculation using Haversine formula
+        function trackGPS(destinationBuilding) {
+            const gpsWidget = document.getElementById('gpsWidget');
+            if (!navigator.geolocation) {
+                gpsWidget.innerHTML = "<span>GPS not supported</span>";
+                return;
+            }
+            const target = buildingCoords[destinationBuilding];
+            if (!target) {
+                gpsWidget.innerHTML = "<span>Location building unmapped</span>";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat1 = pos.coords.latitude;
+                const lon1 = pos.coords.longitude;
+                const R = 3958.8; // Radius of the earth in miles
+                const dLat = (target.lat - lat1) * Math.PI / 180;
+                const dLon = (target.lon - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                          Math.cos(lat1 * Math.PI / 180) * Math.cos(target.lat * Math.PI / 180) *
+                          Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                const distanceMiles = R * c;
+                const distanceFeet = Math.round(distanceMiles * 5280);
+                
+                gpsWidget.innerHTML = `<span>📍 Distance:</span><strong>${distanceFeet > 1000 ? (distanceMiles.toFixed(1) + ' mi') : (distanceFeet + ' ft away')}</strong>`;
+            }, () => {
+                gpsWidget.innerHTML = "<span>📍 GPS permission denied</span>";
+            });
+        }
 
         // Dark Mode Logic
         function toggleTheme() {
@@ -706,57 +736,71 @@
             }
         }
 
-        // Assignment Tracker Functions
-        function saveAssignments() {
-            localStorage.setItem('assignments', JSON.stringify(assignments));
-            renderAssignments();
-        }
-
-        function addAssignment(e) {
-            e.preventDefault();
-            const title = document.getElementById('taskTitle').value;
-            const date = document.getElementById('taskDate').value;
-            if (!title || !date) return;
-
-            assignments.push({ id: Date.now(), title, date, completed: false });
-            document.getElementById('taskTitle').value = '';
-            document.getElementById('taskDate').value = '';
-            saveAssignments();
-        }
-
-        function toggleAssignment(id) {
-            assignments = assignments.map(a => a.id === id ? { ...a, completed: !a.completed } : a);
-            saveAssignments();
-        }
-
-        function deleteAssignment(id) {
-            assignments = assignments.filter(a => a.id !== id);
-            saveAssignments();
-        }
-
-        function renderAssignments() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            if (assignments.length === 0) {
-                list.innerHTML = '<li style="font-size:0.75rem; color:var(--text-muted);">No upcoming tasks.</li>';
-                return;
-            }
-
-            assignments.forEach(task => {
-                const li = document.createElement('li');
-                li.className = `task-item ${task.completed ? 'completed' : ''}`;
-                li.innerHTML = `
-                    <div class="task-meta">
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleAssignment(${task.id})">
-                            <span>${task.title}</span>
-                        </label>
-                        <span class="task-date-tag">Due: ${task.date}</span>
-                    </div>
-                    <button class="delete-task-btn" onclick="deleteAssignment(${task.id})">✕</button>
-                `;
-                list.appendChild(li);
+        // ICS Calendar Export Generator
+        function exportICS() {
+            let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//ECU Class Navigator//EN\n";
+            const dayMap = { Monday: 'MO', Tuesday: 'TU', Wednesday: 'WE', Thursday: 'TH', Friday: 'FR' };
+            
+            Object.keys(schedule).forEach(day => {
+                schedule[day].forEach(cls => {
+                    icsContent += "BEGIN:VEVENT\n";
+                    icsContent += `SUMMARY:${cls.title}\n`;
+                    icsContent += `LOCATION:${cls.building} - ${cls.room}\n`;
+                    icsContent += `DESCRIPTION:ECU Class Schedule Item\n`;
+                    icsContent += `END:VEVENT\n`;
+                });
             });
+            icsContent += "END:VCALENDAR";
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', 'ecu_schedule.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // JSON Backup & Restore Functions
+        function exportJSONBackup() {
+            const data = {
+                sprintMode: isSprintMode,
+                theme: localStorage.getItem('theme'),
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', 'class_navigator_backup.json');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importJSONBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.theme) {
+                        localStorage.setItem('theme', parsed.theme);
+                        if (parsed.theme === 'dark') document.body.classList.add('dark-mode');
+                        else document.body.classList.remove('dark-mode');
+                    }
+                    if (parsed.sprintMode !== undefined) {
+                        isSprintMode = parsed.sprintMode;
+                        localStorage.setItem('sprintMode', isSprintMode);
+                        updateSprintUI();
+                    }
+                    alert("Settings restored successfully!");
+                    if (activeDay) renderDay(activeDay);
+                } catch (err) {
+                    alert("Invalid backup file format.");
+                }
+            };
+            reader.readAsText(file);
         }
 
         function getMapLink(destination) {
@@ -844,7 +888,7 @@
                 titleElem.textContent = result.cls.title;
                 timerElem.textContent = formatHMS(secsRemaining);
                 subtextElem.textContent = `Ends at ${result.cls.time.split('-')[1].trim()}`;
-                banner.classList.remove('sprint-alert');
+                banner.classList.remove('sprint-alert', 'rain-alert');
                 
                 const totalDuration = result.targetTime - result.startTime;
                 const elapsed = now - result.startTime;
@@ -856,12 +900,17 @@
             } else {
                 activeClassId = null;
                 
-                // Tight transition check (<10 min away trigger Sprint Alert)
-                if (result.dayOffset === 0 && secsRemaining <= 600) {
+                // Trigger Rain Warning or Tight Transition Alert
+                if (currentPrecipitation > 0 && result.dayOffset === 0 && secsRemaining <= 1800) {
+                    banner.classList.add('rain-alert');
+                    banner.classList.remove('sprint-alert');
+                    tagElem.textContent = "🌧️ Rain Warning on Walk!";
+                } else if (result.dayOffset === 0 && secsRemaining <= 600) {
                     banner.classList.add('sprint-alert');
+                    banner.classList.remove('rain-alert');
                     tagElem.textContent = "⚡ Tight Transition!";
                 } else {
-                    banner.classList.remove('sprint-alert');
+                    banner.classList.remove('sprint-alert', 'rain-alert');
                     tagElem.textContent = result.dayOffset === 0 ? "Up Next" : "Next Class";
                 }
 
@@ -875,6 +924,7 @@
                     : `Starts ${result.dayName} at ${startStr}`;
                 
                 progContainer.style.display = "none";
+                trackGPS(result.cls.building);
             }
 
             const todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()];
@@ -985,7 +1035,6 @@
 
         // Init
         updateSprintUI();
-        renderAssignments();
         updateTracker();
         setInterval(updateTracker, 1000);
     </script>
