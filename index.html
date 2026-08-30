@@ -2,39 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0d0f14">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+  <meta name="theme-color" content="#592A8A">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Class Nav">
   <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">
-  <title>Class Navigator - ECU</title>
+
+  <title>Class Navigator — ECU</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Manrope:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  >
 
   <style>
     :root {
-      --bg: #090b10;
-      --panel: rgba(20, 24, 33, 0.72);
-      --border: rgba(255, 255, 255, 0.09);
-      --border-strong: rgba(255, 255, 255, 0.16);
-      --text: #f5f7ff;
-      --muted: #a8b0c4;
-      --purple: #7d63ff;
-      --purple-2: #5b43dc;
-      --blue: #8cb8ff;
-      --green: #3ddc97;
-      --gold: #ffcf74;
-      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.42);
-      --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.26);
-      --shadow-sm: 0 8px 18px rgba(0, 0, 0, 0.18);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 18px;
-      --safe-top: max(env(safe-area-inset-top), 14px);
-      --safe-bottom: max(env(safe-area-inset-bottom), 18px);
+      color-scheme: light dark;
+
+      --font-ui: "DM Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      --font-display: "Manrope", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+
+      --purple: #592A8A;
+      --purple-deep: #3D1C60;
+      --gold: #FDC82F;
+      --blue: #2563EB;
+      --green: #16865A;
+      --red: #B4233B;
+
+      --safe-top: max(env(safe-area-inset-top), 12px);
+      --safe-bottom: max(env(safe-area-inset-bottom), 16px);
+
+      --page: #F2F2F7;
+      --surface: #FFFFFF;
+      --surface-alt: #F7F7FA;
+      --surface-soft: #EFEFF4;
+      --text: #111218;
+      --text-secondary: #5E6170;
+      --text-tertiary: #858999;
+      --border: rgba(17, 18, 24, 0.10);
+      --border-strong: rgba(17, 18, 24, 0.18);
+      --accent-soft: rgba(89, 42, 138, 0.10);
+      --blue-soft: rgba(37, 99, 235, 0.10);
+      --green-soft: rgba(22, 134, 90, 0.10);
+      --red-soft: rgba(180, 35, 59, 0.10);
+      --shadow: 0 8px 22px rgba(20, 20, 30, 0.06);
+      --shadow-raised: 0 16px 40px rgba(20, 20, 30, 0.12);
+    }
+
+    html[data-theme="dark"] {
+      --page: #000000;
+      --surface: #1C1C1E;
+      --surface-alt: #252527;
+      --surface-soft: #2C2C2E;
+      --text: #F5F5F7;
+      --text-secondary: #AEAEB2;
+      --text-tertiary: #77777D;
+      --border: rgba(255, 255, 255, 0.10);
+      --border-strong: rgba(255, 255, 255, 0.20);
+      --accent-soft: rgba(170, 117, 255, 0.18);
+      --blue-soft: rgba(95, 161, 255, 0.16);
+      --green-soft: rgba(58, 202, 130, 0.16);
+      --red-soft: rgba(255, 112, 132, 0.16);
+      --shadow: none;
+      --shadow-raised: 0 18px 42px rgba(0, 0, 0, 0.42);
     }
 
     * {
@@ -46,19 +82,19 @@
     html {
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
+      background: var(--page);
     }
 
     body {
       min-height: 100dvh;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      padding: calc(var(--safe-top) + 8px) 16px calc(var(--safe-bottom) + 20px);
       color: var(--text);
-      background:
-        radial-gradient(circle at 0% 0%, rgba(125, 99, 255, 0.28), transparent 32%),
-        radial-gradient(circle at 100% 0%, rgba(140, 184, 255, 0.16), transparent 28%),
-        linear-gradient(180deg, #12141b 0%, #090b10 100%);
-      padding: calc(var(--safe-top) + 8px) 14px calc(var(--safe-bottom) + 22px);
+      background: var(--page);
+      font-family: var(--font-ui);
+      font-size: 16px;
+      line-height: 1.45;
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
+      transition: background-color 180ms ease, color 180ms ease;
     }
 
     button,
@@ -67,194 +103,176 @@
       font: inherit;
     }
 
-    button,
-    a {
+    button {
+      border: 0;
+      cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
 
     a {
-      text-decoration: none;
       color: inherit;
+      text-decoration: none;
     }
 
     :focus-visible {
-      outline: 2px solid rgba(140, 184, 255, 0.8);
-      outline-offset: 2px;
+      outline: 3px solid rgba(89, 42, 138, 0.55);
+      outline-offset: 3px;
     }
 
-    .shell {
-      max-width: 1180px;
+    .app-shell {
+      width: min(100%, 1140px);
       margin: 0 auto;
       display: grid;
       gap: 18px;
     }
 
-    @media (min-width: 980px) {
-      .shell {
-        grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.72fr);
+    @media (min-width: 950px) {
+      .app-shell {
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.75fr);
         align-items: start;
       }
 
-      .sidebar {
+      .side-column {
         position: sticky;
-        top: 18px;
+        top: 20px;
       }
     }
 
-    .app,
-    .utility-card,
-    .class-card,
-    .pack-card,
-    .empty-state {
-      border-radius: var(--radius-xl);
+    .main-panel {
+      min-width: 0;
     }
 
-    .app {
-      padding: 18px;
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.05),
-        rgba(255, 255, 255, 0.025)
-      );
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: saturate(180%) blur(28px);
-      -webkit-backdrop-filter: saturate(180%) blur(28px);
-    }
-
-    header {
+    .app-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 18px;
+      gap: 16px;
+      padding: 4px 2px 20px;
     }
 
-    .eyebrow {
+    .brand-mark {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       margin-bottom: 8px;
-      color: var(--muted);
+      color: var(--purple);
+      font-family: var(--font-display);
       font-size: 12px;
+      font-weight: 800;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      font-weight: 800;
     }
 
-    .eyebrow::before {
+    .brand-mark::before {
       content: "";
       width: 8px;
       height: 8px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), #fff3c8);
-      box-shadow: 0 0 18px rgba(255, 207, 116, 0.5);
+      background: var(--gold);
+      border-radius: 2px;
     }
 
     h1 {
-      font-size: clamp(1.75rem, 1.45rem + 1vw, 2.35rem);
-      line-height: 1.02;
-      letter-spacing: -0.06em;
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 1.4rem + 1.2vw, 2.45rem);
+      line-height: 1.05;
+      letter-spacing: -0.055em;
       font-weight: 800;
     }
 
-    .subtitle {
+    .header-date {
       margin-top: 8px;
-      color: var(--muted);
+      color: var(--text-secondary);
       font-size: 14px;
-      max-width: 28ch;
-      line-height: 1.45;
+      font-weight: 500;
     }
 
-    .icon-btn {
-      width: 46px;
-      height: 46px;
+    .theme-btn {
+      width: 44px;
+      height: 44px;
       display: grid;
       place-items: center;
-      border-radius: 16px;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.055);
+      border-radius: 12px;
       color: var(--text);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      cursor: pointer;
+      background: var(--surface);
+      box-shadow: var(--shadow);
     }
 
-    .week-strip,
-    .day-selector {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+    .theme-btn svg {
+      width: 19px;
+      height: 19px;
     }
 
     .week-strip {
-      margin-bottom: 12px;
-    }
-
-    .week-cell,
-    .day-btn {
-      min-height: 56px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--muted);
-      cursor: pointer;
-      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
     }
 
     .week-cell {
-      padding: 10px 4px;
+      min-height: 58px;
+      padding: 8px 4px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text-secondary);
       text-align: center;
+      box-shadow: var(--shadow);
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
     }
 
     .week-cell small {
       display: block;
+      margin-bottom: 2px;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .week-cell strong {
       display: block;
-      font-size: 16px;
       color: var(--text);
-      margin-top: 2px;
+      font-size: 16px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
     }
 
     .week-cell.is-today {
-      border-color: rgba(125, 99, 255, 0.42);
+      border-color: rgba(89, 42, 138, 0.45);
     }
 
-    .week-cell.is-active,
-    .day-btn.active {
+    .week-cell.is-active {
+      border-color: var(--purple);
+      background: var(--purple);
       color: #fff;
-      background: linear-gradient(
-        180deg,
-        rgba(125, 99, 255, 0.96),
-        rgba(91, 67, 220, 0.98)
-      );
-      border-color: rgba(174, 160, 255, 0.45);
-      box-shadow: 0 14px 28px rgba(91, 67, 220, 0.34);
+      box-shadow: 0 8px 18px rgba(89, 42, 138, 0.22);
+    }
+
+    .week-cell.is-active strong {
+      color: #fff;
     }
 
     .holiday-note {
-      min-height: 18px;
-      color: var(--muted);
-      font-size: 12px;
+      min-height: 17px;
       margin-bottom: 12px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
     }
 
     .viewing-chip {
       display: none;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 14px;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(140, 184, 255, 0.08);
-      border: 1px solid rgba(140, 184, 255, 0.14);
-      color: #dbe8ff;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text-secondary);
       font-size: 14px;
       font-weight: 600;
     }
@@ -264,309 +282,351 @@
     }
 
     .viewing-chip button {
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 8px;
+      color: var(--purple);
+      background: var(--accent-soft);
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    .status-banner {
-      position: relative;
+    .status-card {
+      margin-bottom: 16px;
+      padding: 22px;
       overflow: hidden;
-      margin-bottom: 18px;
-      padding: 20px;
-      border-radius: 30px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: #fff;
       background:
-        linear-gradient(
-          145deg,
-          rgba(125, 99, 255, 0.42),
-          rgba(17, 19, 24, 0.58) 44%,
-          rgba(140, 184, 255, 0.18)
-        ),
-        rgba(19, 22, 28, 0.94);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: var(--shadow-lg);
+        linear-gradient(135deg, var(--purple) 0%, var(--purple-deep) 100%);
+      box-shadow: 0 16px 32px rgba(61, 28, 96, 0.22);
     }
 
-    .status-banner::after {
-      content: "";
-      position: absolute;
-      right: -50px;
-      bottom: -90px;
-      width: 230px;
-      height: 230px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(125, 99, 255, 0.42), transparent 70%);
-      filter: blur(14px);
-      pointer-events: none;
-    }
-
-    .status-header,
-    .pack-head,
-    .card-header {
+    .status-topline {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-    }
-
-    .status-header {
       margin-bottom: 10px;
     }
 
     .status-tag {
-      min-height: 34px;
       display: inline-flex;
       align-items: center;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.10);
+      color: rgba(255, 255, 255, 0.9);
       font-size: 11px;
+      font-weight: 800;
       letter-spacing: 0.09em;
       text-transform: uppercase;
-      font-weight: 800;
     }
 
     .status-tag.in-class {
-      background: rgba(61, 220, 151, 0.12);
-      color: #baf5d8;
-      border-color: rgba(61, 220, 151, 0.24);
+      border-color: rgba(118, 255, 183, 0.36);
+      background: rgba(42, 194, 113, 0.18);
+      color: #BDFBD8;
     }
 
     .countdown-title {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.86);
-      margin-bottom: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 15px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .countdown-timer {
-      font-size: clamp(2.35rem, 2rem + 2vw, 3.35rem);
-      line-height: 0.94;
-      letter-spacing: -0.08em;
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 2rem + 2.4vw, 3.6rem);
       font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.07em;
       font-variant-numeric: tabular-nums;
     }
 
     .countdown-subtext {
-      margin-top: 10px;
-      color: var(--muted);
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.72);
       font-size: 14px;
+      font-weight: 500;
     }
 
     .leave-row {
       display: none;
-      margin-top: 12px;
       width: fit-content;
-      min-height: 38px;
+      min-height: 34px;
       align-items: center;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.09);
-      font-size: 14px;
+      margin-top: 14px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 13px;
       font-weight: 700;
     }
 
     .progress-container {
       display: none;
-      margin-top: 16px;
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.1);
+      height: 5px;
+      margin-top: 18px;
       overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
     }
 
     .progress-bar {
-      height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--green), #82efbd);
+      height: 100%;
+      border-radius: inherit;
+      background: #47D78C;
+      transition: width 400ms linear;
     }
 
     .day-selector {
-      padding: 6px;
-      margin-bottom: 18px;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.045);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      margin-bottom: 16px;
+      padding: 4px;
       border: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      border-radius: 12px;
+      background: var(--surface-soft);
     }
 
     .day-btn {
+      min-height: 42px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      background: transparent;
       font-size: 14px;
       font-weight: 700;
     }
 
-    .utility-card,
+    .day-btn.active {
+      color: var(--text);
+      background: var(--surface);
+      box-shadow: 0 1px 5px rgba(20, 20, 30, 0.14);
+    }
+
     .class-card,
     .pack-card,
+    .utility-card,
     .empty-state {
-      padding: 18px;
-      background: rgba(18, 22, 30, 0.78);
       border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      backdrop-filter: saturate(180%) blur(24px);
-      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
     }
 
-    .utility-header,
-    .card-kicker,
-    .checklist-title {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--muted);
+    .class-card {
+      margin-bottom: 12px;
+      padding: 18px;
     }
 
-    .utility-header {
+    .class-card.is-active-class {
+      border-color: rgba(89, 42, 138, 0.45);
+      box-shadow: 0 12px 28px rgba(89, 42, 138, 0.11);
+    }
+
+    .class-card.is-past {
+      opacity: 0.62;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 12px;
     }
 
-    .weather-info {
-      min-height: 54px;
+    .class-time,
+    .walk-badge,
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .class-time {
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      background: var(--surface-alt);
+    }
+
+    .walk-badge {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .live-badge {
+      gap: 6px;
+      width: fit-content;
+      margin-bottom: 10px;
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .live-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .class-title {
+      margin-bottom: 8px;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.32;
+      letter-spacing: -0.03em;
+    }
+
+    .class-location {
+      margin-bottom: 14px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .checklist-container {
+      margin-bottom: 14px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-alt);
+    }
+
+    .checklist-title {
+      margin-bottom: 10px;
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .checklist-items {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .checklist-item,
+    .pack-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .checklist-item input,
+    .pack-item input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--purple);
+      flex: 0 0 auto;
+    }
+
+    .nav-btn {
+      width: 100%;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--purple);
+      background: var(--accent-soft);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .pack-card {
+      margin-bottom: 12px;
+      padding: 18px;
+    }
+
+    .card-kicker,
+    .utility-header {
+      color: var(--text-tertiary);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .pack-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      padding: 14px 15px;
-      margin-bottom: 10px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.045);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .weather-info strong {
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    .hourly-row {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
       margin: 8px 0 14px;
     }
 
-    .hourly-chip {
-      padding: 10px 6px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.04);
-      text-align: center;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .hourly-chip strong {
-      display: block;
-      margin: 2px 0;
+    .pack-head strong {
       color: var(--text);
-      font-size: 14px;
-    }
-
-    .utility-btn,
-    .nav-btn {
-      width: 100%;
-      min-height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 16px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-
-    .utility-btn.primary,
-    .nav-btn.primary {
-      background: linear-gradient(
-        180deg,
-        rgba(125, 99, 255, 0.95),
-        rgba(91, 67, 220, 0.98)
-      );
-      border-color: rgba(174, 160, 255, 0.42);
-      box-shadow: 0 16px 30px rgba(91, 67, 220, 0.34);
-    }
-
-    .utility-btn + .utility-btn {
-      margin-top: 10px;
-    }
-
-    .pack-card {
-      margin-bottom: 14px;
-      background: linear-gradient(
-        180deg,
-        rgba(125, 99, 255, 0.13),
-        rgba(255, 255, 255, 0.03)
-      );
-      border-color: rgba(125, 99, 255, 0.18);
-    }
-
-    .pack-head {
-      margin: 10px 0 12px;
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
     }
 
     .pack-head button {
       min-height: 34px;
-      padding: 0 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
+      padding: 0 10px;
+      border-radius: 7px;
+      color: var(--text-secondary);
+      background: var(--surface-alt);
       font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
+      font-weight: 800;
     }
 
-    .pack-items,
-    .checklist-items {
+    .pack-items {
       display: grid;
-      gap: 10px;
-    }
-
-    .checklist-items {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .pack-item,
-    .checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: #edf2ff;
-    }
-
-    .pack-item input[type="checkbox"],
-    .checklist-item input {
-      width: 17px;
-      height: 17px;
-      accent-color: var(--purple);
-      flex-shrink: 0;
+      gap: 9px;
     }
 
     .pack-item input[type="text"],
     .pack-add input {
       width: 100%;
-      min-height: 46px;
-      padding: 0 14px;
-      border-radius: 16px;
-      border: 1px solid var(--border-strong);
-      background: rgba(255, 255, 255, 0.055);
+      min-height: 43px;
+      padding: 0 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
       color: var(--text);
+      background: var(--surface-alt);
+      font-size: 14px;
+    }
+
+    .pack-item input[type="text"]:focus,
+    .pack-add input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(89, 42, 138, 0.14);
     }
 
     .pack-item .del {
@@ -574,243 +634,186 @@
       height: 32px;
       display: grid;
       place-items: center;
-      border-radius: 10px;
-      border: 0;
-      background: rgba(255, 122, 144, 0.1);
-      color: #ffc0cc;
-      font-size: 18px;
-      cursor: pointer;
+      border-radius: 7px;
+      color: var(--red);
+      background: var(--red-soft);
+      font-size: 17px;
+      font-weight: 700;
     }
 
     .pack-add {
-      display: flex;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
       margin-top: 12px;
     }
 
-    .class-card {
-      margin-bottom: 14px;
+    .pack-add button {
+      min-width: 70px;
+      min-height: 43px;
+      padding: 0 14px;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--purple);
+      font-size: 14px;
+      font-weight: 800;
     }
 
-    .class-card.is-active-class {
-      border-color: rgba(125, 99, 255, 0.34);
-      background: linear-gradient(
-        180deg,
-        rgba(125, 99, 255, 0.1),
-        rgba(18, 22, 30, 0.86)
-      );
-      box-shadow: 0 18px 34px rgba(91, 67, 220, 0.2);
+    .utility-card {
+      padding: 18px;
     }
 
-    .class-card.is-past {
-      opacity: 0.6;
-    }
-
-    .card-header {
+    .utility-header {
       margin-bottom: 12px;
     }
 
-    .class-time,
-    .walk-badge,
-    .live-badge {
-      min-height: 32px;
-      display: inline-flex;
+    .weather-info {
+      min-height: 50px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 0 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .class-time {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .walk-badge {
-      background: rgba(140, 184, 255, 0.1);
-      border: 1px solid rgba(140, 184, 255, 0.15);
-      color: #d7e7ff;
-    }
-
-    .live-badge {
-      gap: 6px;
-      background: rgba(61, 220, 151, 0.12);
-      color: #baf5d8;
-      margin-bottom: 8px;
-    }
-
-    .live-badge::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-      box-shadow: 0 0 12px currentColor;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%,
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      50% {
-        opacity: 0.45;
-        transform: scale(1.18);
-      }
-    }
-
-    .class-title {
-      font-size: 17px;
-      line-height: 1.3;
-      letter-spacing: -0.03em;
-      font-weight: 750;
-      margin-bottom: 10px;
-    }
-
-    .class-location {
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 14px;
-    }
-
-    .checklist-container {
-      padding: 14px;
-      margin-bottom: 14px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.045);
-      border: 1px solid var(--border);
-    }
-
-    .checklist-title {
-      color: #ffdce3;
-      margin-bottom: 10px;
-    }
-
-    .nav-row {
-      display: grid;
       gap: 10px;
+      margin-bottom: 8px;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-secondary);
+      background: var(--surface-alt);
+      font-size: 14px;
+      font-weight: 600;
     }
 
-    .nav-row.two {
-      grid-template-columns: 1fr 1fr;
+    .weather-info strong {
+      color: var(--text);
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .hourly-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin: 10px 0 14px;
+    }
+
+    .hourly-chip {
+      min-width: 0;
+      padding: 8px 3px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-tertiary);
+      background: var(--surface-alt);
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .hourly-chip strong {
+      display: block;
+      margin: 2px 0;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .utility-btn {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--purple);
+      background: var(--accent-soft);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .utility-btn + .utility-btn {
+      margin-top: 8px;
+      color: var(--text-secondary);
+      background: var(--surface-alt);
     }
 
     .empty-state {
+      padding: 38px 20px;
+      color: var(--text-secondary);
       text-align: center;
-      color: var(--muted);
-      padding: 40px 20px;
     }
 
     .empty-state strong {
       display: block;
+      margin-bottom: 6px;
       color: var(--text);
+      font-family: var(--font-display);
       font-size: 18px;
-      margin-bottom: 8px;
+      font-weight: 800;
     }
 
     .toast {
       position: fixed;
       left: 50%;
       bottom: calc(var(--safe-bottom) + 8px);
-      transform: translate(-50%, 130%);
-      min-width: min(92vw, 340px);
-      max-width: 92vw;
-      padding: 14px 16px;
-      border-radius: 18px;
+      z-index: 1000;
+      width: min(92vw, 400px);
+      padding: 13px 15px;
       border: 1px solid var(--border);
-      background: rgba(20, 24, 32, 0.92);
-      color: #fff;
-      box-shadow: var(--shadow-md);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      text-align: center;
+      border-radius: 10px;
+      color: var(--text);
+      background: var(--surface);
+      box-shadow: var(--shadow-raised);
       font-size: 14px;
       font-weight: 700;
-      z-index: 999;
-      transition: transform 0.22s ease;
+      text-align: center;
+      transform: translate(-50%, 140%);
+      transition: transform 220ms ease;
     }
 
     .toast.show {
       transform: translate(-50%, 0);
     }
 
-    @media (hover: hover) {
-      .icon-btn:hover,
-      .utility-btn:hover,
-      .nav-btn:hover,
-      .week-cell:hover,
-      .day-btn:hover,
-      .pack-head button:hover,
-      .viewing-chip button:hover {
-        transform: translateY(-1px);
-        border-color: rgba(255, 255, 255, 0.18);
-      }
-    }
-
-    .icon-btn:active,
-    .utility-btn:active,
-    .nav-btn:active,
-    .week-cell:active,
-    .day-btn:active,
-    .pack-head button:active,
-    .viewing-chip button:active {
-      transform: scale(0.98);
-    }
-
     @media (max-width: 560px) {
-      .app,
-      .utility-card,
-      .class-card,
-      .pack-card {
-        padding: 16px;
+      .app-header {
+        padding-bottom: 16px;
       }
 
-      .subtitle {
-        max-width: none;
+      .checklist-items {
+        grid-template-columns: 1fr;
       }
 
-      .hourly-row {
-        overflow-x: auto;
-        grid-template-columns: repeat(5, minmax(54px, 1fr));
-      }
-
-      .checklist-items,
-      .nav-row.two,
       .pack-add {
         grid-template-columns: 1fr;
-        display: grid;
       }
 
-      .pack-add {
-        gap: 10px;
+      .pack-add button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="shell">
-    <main class="app">
-      <header>
+  <div class="app-shell">
+    <main class="main-panel">
+      <header class="app-header">
         <div>
-          <div class="eyebrow">ECU Flow</div>
+          <div class="brand-mark">ECU</div>
           <h1>Class Navigator</h1>
-          <p class="subtitle">
-            Cleaner iPhone styling, no sprint mode, no add-to-home-screen control,
-            and softer glassmorphism with better iOS spacing.
-          </p>
+          <p class="header-date" id="headerDate"></p>
         </div>
 
-        <button class="icon-btn" id="themeBtn" aria-label="Toggle contrast mode">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
+        <button class="theme-btn" id="themeBtn" aria-label="Switch appearance">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
           </svg>
         </button>
@@ -821,17 +824,17 @@
 
       <div class="viewing-chip" id="viewingChip">
         <span id="viewingText">Viewing another day</span>
-        <button type="button" id="jumpTodayBtn">Jump to today</button>
+        <button type="button" id="jumpTodayBtn">Today</button>
       </div>
 
-      <section class="status-banner" id="statusBanner">
-        <div class="status-header">
-          <span class="status-tag" id="statusTag">Schedule Tracker</span>
+      <section class="status-card" id="statusCard" aria-live="polite">
+        <div class="status-topline">
+          <span class="status-tag" id="statusTag">Next Class</span>
         </div>
 
         <div class="countdown-title" id="countdownTitle">Loading schedule...</div>
         <div class="countdown-timer" id="countdownTimer">--:--:--</div>
-        <div class="countdown-subtext" id="countdownSubtext">Calculating time remaining</div>
+        <div class="countdown-subtext" id="countdownSubtext">Calculating your schedule</div>
 
         <div class="leave-row" id="leaveRow"></div>
 
@@ -851,23 +854,29 @@
       <section id="scheduleContainer" aria-live="polite"></section>
     </main>
 
-    <aside class="sidebar">
+    <aside class="side-column">
       <section class="utility-card">
-        <div class="utility-header">Live Conditions</div>
+        <div class="utility-header">Campus Conditions</div>
 
         <div class="weather-info" id="weatherWidget">
           <span>Loading weather...</span>
         </div>
 
-        <div class="weather-info" id="gpsWidget" style="font-size: 12px;">
-          <span>Location distance: not tracked</span>
+        <div class="weather-info" id="gpsWidget">
+          <span>Location not tracked</span>
         </div>
 
         <div class="hourly-row" id="hourlyRow"></div>
+
         <div class="holiday-note" id="calendarNote"></div>
 
-        <button class="utility-btn primary" id="notifyBtn">Turn on reminders</button>
-        <button class="utility-btn" id="calendarBtn">Export schedule (.ics)</button>
+        <button class="utility-btn" id="notifyBtn">
+          Enable class reminders
+        </button>
+
+        <button class="utility-btn" id="calendarBtn">
+          Export schedule (.ics)
+        </button>
       </section>
     </aside>
   </div>
@@ -885,8 +894,8 @@
       "Saturday"
     ];
 
-    const TERM_END = "20261211T235959";
     const TERM_START = "2026-08-17";
+    const TERM_END = new Date("2026-12-11T23:59:59");
 
     const buildings = {
       greene: {
@@ -929,29 +938,29 @@
 
     const walkMatrix = {
       greene: {
-        scitech: [8],
-        brewster: [6],
-        austin: [5],
-        rawl: [7],
-        hsc: [25]
+        scitech: 8,
+        brewster: 6,
+        austin: 5,
+        rawl: 7,
+        hsc: 25
       },
       scitech: {
-        brewster: [6],
-        austin: [5],
-        rawl: [6],
-        hsc: [25]
+        brewster: 6,
+        austin: 5,
+        rawl: 6,
+        hsc: 25
       },
       brewster: {
-        austin: [4],
-        rawl: [4],
-        hsc: [24]
+        austin: 4,
+        rawl: 4,
+        hsc: 24
       },
       austin: {
-        rawl: [5],
-        hsc: [24]
+        rawl: 5,
+        hsc: 24
       },
       rawl: {
-        hsc: [23]
+        hsc: 23
       }
     };
 
@@ -959,7 +968,7 @@
       Monday: [
         {
           id: "mon-1",
-          time: "09:00 AM - 09:50 AM",
+          time: "09:00 AM – 09:50 AM",
           start: "09:00",
           end: "09:50",
           title: "CHEM 1150: General Chemistry I",
@@ -968,7 +977,7 @@
         },
         {
           id: "mon-2",
-          time: "02:00 PM - 04:50 PM",
+          time: "02:00 PM – 04:50 PM",
           start: "14:00",
           end: "16:50",
           title: "BIOL 1101: Principles of Biology Lab I",
@@ -980,7 +989,7 @@
       Tuesday: [
         {
           id: "tue-1",
-          time: "09:00 AM - 09:50 AM",
+          time: "09:00 AM – 09:50 AM",
           start: "09:00",
           end: "09:50",
           title: "HLTH 1000: Health in Modern Society",
@@ -989,7 +998,7 @@
         },
         {
           id: "tue-2",
-          time: "11:00 AM - 12:15 PM",
+          time: "11:00 AM – 12:15 PM",
           start: "11:00",
           end: "12:15",
           title: "HNRS 2011: BLS Sem in Human",
@@ -998,7 +1007,7 @@
         },
         {
           id: "tue-3",
-          time: "12:30 PM - 01:45 PM",
+          time: "12:30 PM – 01:45 PM",
           start: "12:30",
           end: "13:45",
           title: "BIOL 1100: Principles of Biology I",
@@ -1007,7 +1016,7 @@
         },
         {
           id: "tue-4",
-          time: "05:00 PM - 07:00 PM",
+          time: "05:00 PM – 07:00 PM",
           start: "17:00",
           end: "19:00",
           title: "HNRS 2000: Honors Leadership & Service Colloquium",
@@ -1019,7 +1028,7 @@
       Wednesday: [
         {
           id: "wed-1",
-          time: "09:00 AM - 09:50 AM",
+          time: "09:00 AM – 09:50 AM",
           start: "09:00",
           end: "09:50",
           title: "CHEM 1150: General Chemistry I",
@@ -1028,22 +1037,22 @@
         },
         {
           id: "wed-2",
-          time: "11:00 AM - 01:50 PM",
+          time: "11:00 AM – 01:50 PM",
           start: "11:00",
           end: "13:50",
           title: "CHEM 1151: General Chemistry Lab I",
           room: "Sci & Tech, 00432",
           buildingKey: "scitech",
           checklist: [
-            "Safety Goggles",
-            "Lab Coat",
-            "Long Pants",
-            "Closed-toe Shoes"
+            "Safety goggles",
+            "Lab coat",
+            "Long pants",
+            "Closed-toe shoes"
           ]
         },
         {
           id: "wed-3",
-          time: "03:30 PM - 06:30 PM",
+          time: "03:30 PM – 06:30 PM",
           start: "15:30",
           end: "18:30",
           title: "HNRS 2002: Survey of Health Professions",
@@ -1055,7 +1064,7 @@
       Thursday: [
         {
           id: "thu-1",
-          time: "11:00 AM - 12:15 PM",
+          time: "11:00 AM – 12:15 PM",
           start: "11:00",
           end: "12:15",
           title: "HNRS 2011: BLS Sem in Human",
@@ -1064,7 +1073,7 @@
         },
         {
           id: "thu-2",
-          time: "12:30 PM - 01:45 PM",
+          time: "12:30 PM – 01:45 PM",
           start: "12:30",
           end: "13:45",
           title: "BIOL 1100: Principles of Biology I",
@@ -1076,7 +1085,7 @@
       Friday: [
         {
           id: "fri-1",
-          time: "09:00 AM - 09:50 AM",
+          time: "09:00 AM – 09:50 AM",
           start: "09:00",
           end: "09:50",
           title: "CHEM 1150: General Chemistry I",
@@ -1126,8 +1135,8 @@
 
     const academicNotes = [
       { date: "2026-09-07", title: "Labor Day — no classes" },
-      { date: "2026-10-05", title: "Fall Break (Mon–Tue)" },
-      { date: "2026-11-25", title: "Thanksgiving break starts" }
+      { date: "2026-10-05", title: "Fall Break begins" },
+      { date: "2026-11-25", title: "Thanksgiving break begins" }
     ];
 
     const state = {
@@ -1136,14 +1145,15 @@
       currentPrecipitation: 0,
       hourlyForecast: [],
       lastGps: null,
-      gpsDenied: false,
       lastGpsAt: 0,
+      gpsDenied: false,
       packLists: JSON.parse(JSON.stringify(defaultPackLists)),
       notified: {},
+      theme: "auto",
       storageOK: (() => {
         try {
-          localStorage.setItem("cn-ping", "1");
-          localStorage.removeItem("cn-ping");
+          localStorage.setItem("class-nav-test", "1");
+          localStorage.removeItem("class-nav-test");
           return true;
         } catch {
           return false;
@@ -1153,6 +1163,7 @@
 
     function save(key, value) {
       if (!state.storageOK) return;
+
       try {
         localStorage.setItem(key, JSON.stringify(value));
       } catch {}
@@ -1162,41 +1173,32 @@
       if (!state.storageOK) return fallback;
 
       try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : fallback;
       } catch {
         return fallback;
       }
-    }
-
-    function initState() {
-      state.packLists = load("packLists", state.packLists);
-      state.notified = load("navNotified", {});
-      state.activeDay = todayScheduleName();
     }
 
     function ymd(date) {
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     }
 
-    function noteForDate(date) {
-      return academicNotes.find(note => note.date === ymd(date))?.title || "";
+    function getDateForClass(baseDate, dayName) {
+      const targetDay = DAY_NAMES.indexOf(dayName);
+      const date = new Date(baseDate);
+      const difference = (targetDay - date.getDay() + 7) % 7;
+
+      date.setDate(date.getDate() + difference);
+      return date;
     }
 
-    function isNoClassDate(date) {
-      return [0, 6].includes(date.getDay()) || noClassDates.has(ymd(date));
-    }
+    function parseTime(timeString, baseDate) {
+      const [hours, minutes] = timeString.split(":").map(Number);
+      const date = new Date(baseDate);
 
-    function todayScheduleName() {
-      const name = DAY_NAMES[new Date().getDay()];
-      return schedule[name] ? name : "Monday";
-    }
-
-    function parseTime(timeStr, baseDate) {
-      const [hours, minutes] = timeStr.split(":").map(Number);
-      const d = new Date(baseDate);
-      d.setHours(hours, minutes, 0, 0);
-      return d;
+      date.setHours(hours, minutes, 0, 0);
+      return date;
     }
 
     function formatClock(date) {
@@ -1206,16 +1208,48 @@
       });
     }
 
+    function formatDate(date) {
+      return date.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
     function formatHMS(seconds) {
-      const d = Math.floor(seconds / 86400);
-      const h = Math.floor((seconds % 86400) / 3600);
-      const m = Math.floor((seconds % 3600) / 60);
-      const s = Math.floor(seconds % 60);
+      const total = Math.max(0, Math.floor(seconds));
 
-      if (d > 0) return `${d}d ${h}h ${m}m`;
-      if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      const days = Math.floor(total / 86400);
+      const hours = Math.floor((total % 86400) / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+      const secs = Math.floor(total % 60);
 
-      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`;
+      }
+
+      if (hours > 0) {
+        return `${hours}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      }
+
+      return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function noteForDate(date) {
+      return academicNotes.find(note => note.date === ymd(date))?.title || "";
+    }
+
+    function isNoClassDate(date) {
+      return (
+        date.getDay() === 0 ||
+        date.getDay() === 6 ||
+        noClassDates.has(ymd(date))
+      );
+    }
+
+    function todayScheduleName() {
+      const todayName = DAY_NAMES[new Date().getDay()];
+      return schedule[todayName] ? todayName : "Monday";
     }
 
     function courseKey(title) {
@@ -1227,7 +1261,7 @@
     }
 
     function haversineFeet(lat1, lon1, lat2, lon2) {
-      const R = 3958.8;
+      const earthRadiusMiles = 3958.8;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
 
@@ -1237,20 +1271,28 @@
         Math.cos(lat2 * Math.PI / 180) *
         Math.sin(dLon / 2) ** 2;
 
-      const miles = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const miles =
+        earthRadiusMiles * 2 *
+        Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
       return miles * 5280;
     }
 
     function nearestBuilding(lat, lon) {
-      let best = null;
-      let bestFeet = Infinity;
+      let closest = null;
+      let closestFeet = Infinity;
 
       Object.entries(buildings).forEach(([key, building]) => {
-        const feet = haversineFeet(lat, lon, building.lat, building.lon);
+        const feet = haversineFeet(
+          lat,
+          lon,
+          building.lat,
+          building.lon
+        );
 
-        if (feet < bestFeet) {
-          bestFeet = feet;
-          best = {
+        if (feet < closestFeet) {
+          closestFeet = feet;
+          closest = {
             key,
             feet,
             ...building
@@ -1258,118 +1300,87 @@
         }
       });
 
-      return best;
-    }
-
-    function walkPair(fromKey, toKey) {
-      if (!fromKey || !toKey || fromKey === toKey) return 2;
-
-      if (walkMatrix[fromKey]?.[toKey]) {
-        return walkMatrix[fromKey][toKey][0];
-      }
-
-      if (walkMatrix[toKey]?.[fromKey]) {
-        return walkMatrix[toKey][fromKey][0];
-      }
-
-      return 8;
-    }
-
-    function rainPenalty(toKey) {
-      return state.currentPrecipitation > 0
-        ? toKey === "hsc"
-          ? 5
-          : 3
-        : 0;
+      return closest;
     }
 
     function walkMinutes(fromKey, toKey) {
-      return walkPair(fromKey, toKey) + rainPenalty(toKey);
+      if (!fromKey || !toKey || fromKey === toKey) return 2;
+
+      const baseWalk =
+        walkMatrix[fromKey]?.[toKey] ??
+        walkMatrix[toKey]?.[fromKey] ??
+        8;
+
+      const weatherPenalty =
+        state.currentPrecipitation > 0
+          ? toKey === "hsc"
+            ? 5
+            : 3
+          : 0;
+
+      return baseWalk + weatherPenalty;
     }
 
-    function minutesBetween(endStr, startStr) {
-      const [endHours, endMinutes] = endStr.split(":").map(Number);
-      const [startHours, startMinutes] = startStr.split(":").map(Number);
-
-      return (startHours * 60 + startMinutes) - (endHours * 60 + endMinutes);
-    }
-
-    function originForClass(dayName, index) {
+    function originForClass(dayName, classIndex) {
       if (state.lastGps && Date.now() - state.lastGpsAt < 120000) {
-        const near = nearestBuilding(state.lastGps.lat, state.lastGps.lon);
+        const near = nearestBuilding(
+          state.lastGps.lat,
+          state.lastGps.lon
+        );
 
-        if (near.feet < 500) return near.key;
-
-        if (
-          haversineFeet(
-            state.lastGps.lat,
-            state.lastGps.lon,
-            buildings.hsc.lat,
-            buildings.hsc.lon
-          ) < 1320
-        ) {
-          return "hsc";
+        if (near.feet < 500) {
+          return near.key;
         }
       }
 
-      if (index <= 0) return "greene";
+      if (classIndex <= 0) {
+        return "greene";
+      }
 
-      const previousClass = schedule[dayName][index - 1];
-      const gap = minutesBetween(
-        previousClass.end,
-        schedule[dayName][index].start
-      );
+      const priorClass = schedule[dayName][classIndex - 1];
+      const currentClass = schedule[dayName][classIndex];
 
-      return gap <= 90 ? previousClass.buildingKey : "greene";
+      const [priorHour, priorMinute] = priorClass.end.split(":").map(Number);
+      const [currentHour, currentMinute] = currentClass.start.split(":").map(Number);
+
+      const gap =
+        currentHour * 60 +
+        currentMinute -
+        (priorHour * 60 + priorMinute);
+
+      return gap <= 90 ? priorClass.buildingKey : "greene";
     }
 
-    function alreadyThere(toKey) {
+    function alreadyThere(destinationKey) {
       if (!state.lastGps || Date.now() - state.lastGpsAt > 120000) {
         return false;
       }
 
-      const building = buildings[toKey];
+      const building = buildings[destinationKey];
 
-      return (
-        haversineFeet(
-          state.lastGps.lat,
-          state.lastGps.lon,
-          building.lat,
-          building.lon
-        ) < 400
-      );
+      return haversineFeet(
+        state.lastGps.lat,
+        state.lastGps.lon,
+        building.lat,
+        building.lon
+      ) < 400;
     }
 
-    function mapLink(destinationKey, mode) {
+    function mapLink(destinationKey) {
       const destination = buildings[destinationKey].maps;
+
       let origin = buildings.greene.maps;
 
       if (state.lastGps && Date.now() - state.lastGpsAt < 120000) {
         origin = `${state.lastGps.lat},${state.lastGps.lon}`;
       }
 
-      return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=${mode}`;
-    }
-
-    function weatherLabel(code, precipitation) {
-      if (
-        precipitation > 0 ||
-        (code >= 51 && code < 70) ||
-        (code >= 80 && code < 90)
-      ) {
-        return "Raining";
-      }
-
-      if (code >= 95) return "Storms";
-      if (code >= 71) return "Snow";
-      if (code >= 45) return "Fog";
-      if (code >= 2) return "Cloudy";
-
-      return "Clear";
+      return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=walking`;
     }
 
     function showToast(message) {
       const toast = document.getElementById("toast");
+
       toast.textContent = message;
       toast.classList.add("show");
 
@@ -1377,7 +1388,418 @@
 
       showToast.timeout = setTimeout(() => {
         toast.classList.remove("show");
-      }, 3000);
+      }, 3500);
+    }
+
+    function getNextClass() {
+      const now = new Date();
+
+      for (let offset = 0; offset < 14; offset++) {
+        const date = new Date(now);
+        date.setDate(now.getDate() + offset);
+        date.setHours(0, 0, 0, 0);
+
+        if (isNoClassDate(date)) {
+          continue;
+        }
+
+        const dayName = DAY_NAMES[date.getDay()];
+        const classes = schedule[dayName] || [];
+
+        for (let index = 0; index < classes.length; index++) {
+          const classItem = classes[index];
+          const start = parseTime(classItem.start, date);
+          const end = parseTime(classItem.end, date);
+
+          if (offset === 0 && now > end) {
+            continue;
+          }
+
+          return {
+            classItem,
+            dayName,
+            index,
+            date,
+            start,
+            end
+          };
+        }
+      }
+
+      return null;
+    }
+
+    function updateStatus() {
+      const now = new Date();
+
+      const tag = document.getElementById("statusTag");
+      const title = document.getElementById("countdownTitle");
+      const timer = document.getElementById("countdownTimer");
+      const subtext = document.getElementById("countdownSubtext");
+      const leaveRow = document.getElementById("leaveRow");
+      const progressContainer = document.getElementById("progressContainer");
+      const progressBar = document.getElementById("progressBar");
+
+      leaveRow.style.display = "none";
+      progressContainer.style.display = "none";
+      tag.classList.remove("in-class");
+
+      const todayName = DAY_NAMES[now.getDay()];
+      const todayClasses = schedule[todayName] || [];
+
+      for (let index = 0; index < todayClasses.length; index++) {
+        const classItem = todayClasses[index];
+        const start = parseTime(classItem.start, now);
+        const end = parseTime(classItem.end, now);
+
+        if (now >= start && now <= end) {
+          tag.textContent = "In Class";
+          tag.classList.add("in-class");
+
+          title.textContent = classItem.title;
+          timer.textContent = formatHMS((end - now) / 1000);
+          subtext.textContent = `Ends ${formatClock(end)} · ${classItem.room}`;
+
+          progressContainer.style.display = "block";
+          progressBar.style.width = `${((now - start) / (end - start)) * 100}%`;
+
+          return;
+        }
+      }
+
+      const next = getNextClass();
+
+      if (!next) {
+        tag.textContent = "Schedule Complete";
+        title.textContent = "No remaining classes";
+        timer.textContent = "—";
+        subtext.textContent = "Your current schedule has ended.";
+        return;
+      }
+
+      const travelOrigin = originForClass(next.dayName, next.index);
+      const travelTime = alreadyThere(next.classItem.buildingKey)
+        ? 0
+        : walkMinutes(travelOrigin, next.classItem.buildingKey);
+
+      const leaveAt = new Date(next.start.getTime() - travelTime * 60000);
+      const timeUntil = (next.start - now) / 1000;
+
+      tag.textContent = "Next Class";
+      title.textContent = next.classItem.title;
+      timer.textContent = formatHMS(timeUntil);
+
+      const isToday = ymd(next.date) === ymd(now);
+
+      subtext.textContent = isToday
+        ? `Today at ${formatClock(next.start)} · ${next.classItem.room}`
+        : `${formatDate(next.date)} at ${formatClock(next.start)} · ${next.classItem.room}`;
+
+      leaveRow.style.display = "inline-flex";
+
+      if (travelTime === 0) {
+        leaveRow.textContent = "You are already there";
+      } else {
+        leaveRow.textContent = `Leave by ${formatClock(leaveAt)} · ${travelTime} min walk`;
+      }
+
+      maybeNotify(next.classItem, next.start, leaveAt);
+    }
+
+    function maybeNotify(classItem, classStart, leaveAt) {
+      if (!("Notification" in window)) return;
+      if (Notification.permission !== "granted") return;
+
+      const dateKey = ymd(classStart);
+      const notificationKey = `${dateKey}:${classItem.id}`;
+
+      if (state.notified[notificationKey]) return;
+
+      const now = Date.now();
+
+      if (
+        now >= leaveAt.getTime() - 30000 &&
+        now <= leaveAt.getTime() + 120000
+      ) {
+        new Notification("Class Navigator", {
+          body: `Leave now for ${classItem.title} — ${classItem.room}`,
+          tag: notificationKey,
+          renotify: false
+        });
+
+        state.notified[notificationKey] = true;
+        save("navNotified", state.notified);
+      }
+    }
+
+    function renderWeekStrip() {
+      const weekStrip = document.getElementById("weekStrip");
+      const today = new Date();
+      const monday = new Date(today);
+
+      const mondayOffset = today.getDay() === 0
+        ? -6
+        : 1 - today.getDay();
+
+      monday.setDate(today.getDate() + mondayOffset);
+
+      const weekdays = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ];
+
+      weekStrip.innerHTML = weekdays
+        .map((dayName, index) => {
+          const date = new Date(monday);
+          date.setDate(monday.getDate() + index);
+
+          const isToday = ymd(date) === ymd(today);
+          const isActive = dayName === state.activeDay;
+
+          return `
+            <button
+              class="week-cell ${isToday ? "is-today" : ""} ${isActive ? "is-active" : ""}"
+              data-week-day="${dayName}"
+            >
+              <small>${dayName.slice(0, 3)}</small>
+              <strong>${date.getDate()}</strong>
+            </button>
+          `;
+        })
+        .join("");
+
+      weekStrip.querySelectorAll("[data-week-day]").forEach(button => {
+        button.addEventListener("click", () => {
+          userSelectDay(button.dataset.weekDay);
+        });
+      });
+
+      document.getElementById("weekHoliday").textContent = noteForDate(today);
+    }
+
+    function renderViewingChip() {
+      const viewingChip = document.getElementById("viewingChip");
+
+      if (state.isUserSelected && state.activeDay !== todayScheduleName()) {
+        viewingChip.classList.add("show");
+        document.getElementById("viewingText").textContent =
+          `Viewing ${state.activeDay}`;
+      } else {
+        viewingChip.classList.remove("show");
+      }
+    }
+
+    function renderDaySelector() {
+      document.querySelectorAll(".day-btn").forEach(button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.day === state.activeDay
+        );
+      });
+    }
+
+    function renderPackCard(dayName) {
+      const items = state.packLists[dayName] || [];
+
+      return `
+        <section class="pack-card">
+          <div class="card-kicker">What to bring</div>
+
+          <div class="pack-head">
+            <strong>${dayName}</strong>
+            <button type="button" data-reset-pack="${dayName}">
+              Reset
+            </button>
+          </div>
+
+          <div class="pack-items">
+            ${items.map((item, index) => `
+              <label class="pack-item">
+                <input type="checkbox">
+
+                <input
+                  type="text"
+                  value="${item.replace(/"/g, "&quot;")}"
+                  data-pack-day="${dayName}"
+                  data-pack-index="${index}"
+                >
+
+                <button
+                  type="button"
+                  class="del"
+                  data-delete-day="${dayName}"
+                  data-delete-index="${index}"
+                  aria-label="Delete item"
+                >
+                  ×
+                </button>
+              </label>
+            `).join("")}
+          </div>
+
+          <div class="pack-add">
+            <input
+              type="text"
+              id="packAddInput"
+              placeholder="Add an item"
+              aria-label="Add item to packing list"
+            >
+
+            <button type="button" id="packAddBtn">
+              Add
+            </button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSchedule() {
+      const container = document.getElementById("scheduleContainer");
+      const dayClasses = schedule[state.activeDay] || [];
+      const now = new Date();
+
+      if (!dayClasses.length) {
+        container.innerHTML = `
+          <section class="empty-state">
+            <strong>No classes</strong>
+            Nothing is scheduled for this day.
+          </section>
+        `;
+        return;
+      }
+
+      const classCards = dayClasses.map((classItem, index) => {
+        const selectedDate = getDateForClass(now, state.activeDay);
+        const start = parseTime(classItem.start, selectedDate);
+        const end = parseTime(classItem.end, selectedDate);
+
+        const isToday = state.activeDay === DAY_NAMES[now.getDay()];
+        const isActive = isToday && now >= start && now <= end;
+        const isPast = isToday && now > end;
+
+        const origin = originForClass(state.activeDay, index);
+
+        const travelMinutes = alreadyThere(classItem.buildingKey)
+          ? 0
+          : walkMinutes(origin, classItem.buildingKey);
+
+        return `
+          <article class="class-card ${isActive ? "is-active-class" : ""} ${isPast ? "is-past" : ""}">
+            <div class="card-header">
+              <span class="class-time">${classItem.time}</span>
+              <span class="walk-badge">${travelMinutes} min walk</span>
+            </div>
+
+            ${isActive ? `<div class="live-badge">In class</div>` : ""}
+
+            <div class="class-title">${classItem.title}</div>
+            <div class="class-location">${classItem.room}</div>
+
+            ${
+              classItem.checklist
+                ? `
+                  <div class="checklist-container">
+                    <div class="checklist-title">Lab check</div>
+
+                    <div class="checklist-items">
+                      ${classItem.checklist.map(item => `
+                        <label class="checklist-item">
+                          <input type="checkbox">
+                          <span>${item}</span>
+                        </label>
+                      `).join("")}
+                    </div>
+                  </div>
+                `
+                : ""
+            }
+
+            <div class="nav-row">
+              <a
+                class="nav-btn"
+                href="${mapLink(classItem.buildingKey)}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open walking route
+              </a>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      container.innerHTML =
+        renderPackCard(state.activeDay) +
+        classCards;
+
+      bindPackControls();
+    }
+
+    function bindPackControls() {
+      document.querySelectorAll("[data-pack-day]").forEach(input => {
+        input.addEventListener("change", event => {
+          const day = event.target.dataset.packDay;
+          const index = Number(event.target.dataset.packIndex);
+          const nextValue = event.target.value.trim();
+
+          if (nextValue) {
+            state.packLists[day][index] = nextValue;
+            save("packLists", state.packLists);
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-delete-day]").forEach(button => {
+        button.addEventListener("click", () => {
+          const day = button.dataset.deleteDay;
+          const index = Number(button.dataset.deleteIndex);
+
+          state.packLists[day].splice(index, 1);
+
+          save("packLists", state.packLists);
+          renderSchedule();
+        });
+      });
+
+      document.querySelectorAll("[data-reset-pack]").forEach(button => {
+        button.addEventListener("click", () => {
+          const day = button.dataset.resetPack;
+
+          state.packLists[day] = [...defaultPackLists[day]];
+
+          save("packLists", state.packLists);
+
+          renderSchedule();
+          showToast("Packing list reset.");
+        });
+      });
+
+      const addButton = document.getElementById("packAddBtn");
+      const addInput = document.getElementById("packAddInput");
+
+      function addPackingItem() {
+        const item = addInput.value.trim();
+
+        if (!item) return;
+
+        state.packLists[state.activeDay].push(item);
+
+        save("packLists", state.packLists);
+
+        addInput.value = "";
+        renderSchedule();
+      }
+
+      addButton?.addEventListener("click", addPackingItem);
+
+      addInput?.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          addPackingItem();
+        }
+      });
     }
 
     async function fetchWeather() {
@@ -1387,47 +1809,68 @@
         );
 
         const data = await response.json();
-        const temperatureF = Math.round((data.current.temperature_2m * 9 / 5) + 32);
+
+        const currentTemp = Math.round(
+          (data.current.temperature_2m * 9 / 5) + 32
+        );
 
         state.currentPrecipitation = data.current.precipitation || 0;
 
+        const weatherCode = data.current.weather_code;
+
+        let label = "Clear";
+
+        if (
+          state.currentPrecipitation > 0 ||
+          (weatherCode >= 51 && weatherCode < 70) ||
+          (weatherCode >= 80 && weatherCode < 90)
+        ) {
+          label = "Raining";
+        } else if (weatherCode >= 95) {
+          label = "Storms";
+        } else if (weatherCode >= 2) {
+          label = "Cloudy";
+        }
+
         document.getElementById("weatherWidget").innerHTML = `
           <span>Greenville</span>
-          <strong>${temperatureF}°F · ${weatherLabel(
-            data.current.weather_code,
-            state.currentPrecipitation
-          )}</strong>
+          <strong>${currentTemp}°F · ${label}</strong>
         `;
-
-        state.hourlyForecast = [];
 
         const now = new Date();
 
-        data.hourly.time.forEach((iso, index) => {
-          const time = new Date(iso);
+        state.hourlyForecast = [];
 
-          if (time >= now && state.hourlyForecast.length < 5) {
+        data.hourly.time.forEach((timeString, index) => {
+          const date = new Date(timeString);
+
+          if (date >= now && state.hourlyForecast.length < 5) {
             state.hourlyForecast.push({
-              hour: time.toLocaleTimeString("en-US", { hour: "numeric" }),
-              temp: Math.round((data.hourly.temperature_2m[index] * 9 / 5) + 32),
-              precip: data.hourly.precipitation[index]
+              time: date.toLocaleTimeString("en-US", {
+                hour: "numeric"
+              }),
+              temp: Math.round(
+                (data.hourly.temperature_2m[index] * 9 / 5) + 32
+              ),
+              precipitation: data.hourly.precipitation[index]
             });
           }
         });
 
-        document.getElementById("hourlyRow").innerHTML = state.hourlyForecast
-          .map(item => `
-            <div class="hourly-chip">
-              ${item.hour}
-              <strong>${item.temp}°</strong>
-              ${item.precip > 0 ? "Rain" : "Dry"}
-            </div>
-          `)
-          .join("");
+        document.getElementById("hourlyRow").innerHTML =
+          state.hourlyForecast
+            .map(hour => `
+              <div class="hourly-chip">
+                ${hour.time}
+                <strong>${hour.temp}°</strong>
+                ${hour.precipitation > 0 ? "Rain" : "Dry"}
+              </div>
+            `)
+            .join("");
       } catch {
         document.getElementById("weatherWidget").innerHTML = `
           <span>Greenville</span>
-          <strong>Weather unavailable</strong>
+          <strong>Unavailable</strong>
         `;
       }
     }
@@ -1445,12 +1888,14 @@
 
           state.lastGpsAt = Date.now();
 
-          const near = nearestBuilding(state.lastGps.lat, state.lastGps.lon);
+          const nearest = nearestBuilding(
+            state.lastGps.lat,
+            state.lastGps.lon
+          );
 
-          const label =
-            near.feet > 1000
-              ? `${(near.feet / 5280).toFixed(1)} mi from ${near.label}`
-              : `${Math.round(near.feet)} ft from ${near.label}`;
+          const label = nearest.feet > 1000
+            ? `${(nearest.feet / 5280).toFixed(1)} mi from ${nearest.label}`
+            : `${Math.round(nearest.feet)} ft from ${nearest.label}`;
 
           document.getElementById("gpsWidget").innerHTML = `
             <span>GPS</span>
@@ -1459,8 +1904,9 @@
         },
         () => {
           state.gpsDenied = true;
+
           document.getElementById("gpsWidget").innerHTML = `
-            <span>GPS permission denied</span>
+            <span>GPS unavailable</span>
           `;
         },
         {
@@ -1471,372 +1917,53 @@
       );
     }
 
-    function renderWeekStrip() {
-      const strip = document.getElementById("weekStrip");
-      const today = new Date();
-      const weekday = today.getDay();
-      const monday = new Date(today);
+    function applyTheme(theme) {
+      const root = document.documentElement;
 
-      monday.setDate(today.getDate() + (weekday === 0 ? -6 : 1 - weekday));
+      if (theme === "auto") {
+        const systemDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
 
-      const days = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ];
-
-      strip.innerHTML = days
-        .map((name, index) => {
-          const date = new Date(monday);
-          date.setDate(monday.getDate() + index);
-
-          return `
-            <button
-              class="week-cell ${ymd(date) === ymd(today) ? "is-today" : ""} ${name === state.activeDay ? "is-active" : ""}"
-              data-day="${name}"
-            >
-              <small>${name.slice(0, 3)}</small>
-              <strong>${date.getDate()}</strong>
-            </button>
-          `;
-        })
-        .join("");
-
-      document.getElementById("weekHoliday").textContent = noteForDate(today);
-
-      strip.querySelectorAll("[data-day]").forEach(button => {
-        button.addEventListener("click", () => userSelectDay(button.dataset.day));
-      });
-    }
-
-    function renderViewingChip() {
-      const chip = document.getElementById("viewingChip");
-
-      if (state.activeDay !== todayScheduleName() || state.isUserSelected) {
-        chip.classList.add("show");
-        document.getElementById("viewingText").textContent = `Viewing ${state.activeDay}`;
+        root.dataset.theme = systemDark ? "dark" : "light";
       } else {
-        chip.classList.remove("show");
-      }
-    }
-
-    function renderDaySelector() {
-      document.querySelectorAll(".day-btn").forEach(button => {
-        button.classList.toggle("active", button.dataset.day === state.activeDay);
-      });
-    }
-
-    function renderPackCard(dayName) {
-      const items = state.packLists[dayName] || [];
-
-      return `
-        <section class="pack-card">
-          <div class="card-kicker">Daily pack</div>
-
-          <div class="pack-head">
-            <strong>${dayName} essentials</strong>
-            <button type="button" data-reset-pack="${dayName}">Reset</button>
-          </div>
-
-          <div class="pack-items">
-            ${items
-              .map(
-                (item, index) => `
-                  <label class="pack-item">
-                    <input type="checkbox">
-
-                    <input
-                      type="text"
-                      value="${item.replace(/"/g, "&quot;")}"
-                      data-pack-day="${dayName}"
-                      data-pack-index="${index}"
-                    >
-
-                    <button
-                      type="button"
-                      class="del"
-                      data-del-pack="${dayName}"
-                      data-del-index="${index}"
-                      aria-label="Delete item"
-                    >
-                      ×
-                    </button>
-                  </label>
-                `
-              )
-              .join("")}
-          </div>
-
-          <div class="pack-add">
-            <input type="text" id="packAddInput" placeholder="Add another item">
-            <button type="button" class="nav-btn primary" id="packAddBtn">Add</button>
-          </div>
-        </section>
-      `;
-    }
-
-    function renderSchedule() {
-      const container = document.getElementById("scheduleContainer");
-      const entries = schedule[state.activeDay] || [];
-      const now = new Date();
-
-      if (!entries.length) {
-        container.innerHTML = `
-          <section class="empty-state">
-            <strong>No classes</strong>
-            Nothing scheduled for this day.
-          </section>
-        `;
-        return;
+        root.dataset.theme = theme;
       }
 
-      const cards = entries
-        .map((classItem, index) => {
-          const start = parseTime(classItem.start, now);
-          const end = parseTime(classItem.end, now);
+      state.theme = theme;
+      save("classNavTheme", theme);
 
-          const isToday = state.activeDay === DAY_NAMES[now.getDay()];
-          const isActive = isToday && now >= start && now <= end;
-          const isPast = isToday && now > end;
+      const activeTheme = root.dataset.theme;
 
-          const fromKey = originForClass(state.activeDay, index);
-          const walk = alreadyThere(classItem.buildingKey)
-            ? 0
-            : walkMinutes(fromKey, classItem.buildingKey);
-
-          return `
-            <article class="class-card ${isActive ? "is-active-class" : ""} ${isPast ? "is-past" : ""} course-${courseKey(classItem.title)}">
-              <div class="card-header">
-                <span class="class-time">${classItem.time}</span>
-                <span class="walk-badge">${walk} min travel</span>
-              </div>
-
-              ${isActive ? `<div class="live-badge">In class</div>` : ""}
-
-              <div class="class-title">${classItem.title}</div>
-              <div class="class-location">${classItem.room}</div>
-
-              ${
-                classItem.checklist
-                  ? `
-                    <div class="checklist-container">
-                      <div class="checklist-title">Lab check</div>
-
-                      <div class="checklist-items">
-                        ${classItem.checklist
-                          .map(
-                            item => `
-                              <label class="checklist-item">
-                                <input type="checkbox">
-                                <span>${item}</span>
-                              </label>
-                            `
-                          )
-                          .join("")}
-                      </div>
-                    </div>
-                  `
-                  : ""
-              }
-
-              <div class="nav-row two">
-                <a
-                  class="nav-btn primary"
-                  href="${mapLink(classItem.buildingKey, "walking")}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open walking route
-                </a>
-
-                <a
-                  class="nav-btn"
-                  href="${mapLink(classItem.buildingKey, "driving")}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open driving route
-                </a>
-              </div>
-            </article>
+      document.getElementById("themeIcon").innerHTML =
+        activeTheme === "dark"
+          ? `
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          `
+          : `
+            <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
           `;
-        })
-        .join("");
-
-      container.innerHTML = renderPackCard(state.activeDay) + cards;
-
-      bindPackEvents();
     }
 
-    function bindPackEvents() {
-      document.querySelectorAll("[data-pack-day]").forEach(input => {
-        input.addEventListener("change", event => {
-          const day = event.target.dataset.packDay;
-          const index = Number(event.target.dataset.packIndex);
+    function toggleTheme() {
+      const currentTheme = document.documentElement.dataset.theme;
 
-          state.packLists[day][index] =
-            event.target.value.trim() || state.packLists[day][index];
-
-          save("packLists", state.packLists);
-        });
-      });
-
-      document.querySelectorAll("[data-del-pack]").forEach(button => {
-        button.addEventListener("click", () => {
-          const day = button.dataset.delPack;
-          const index = Number(button.dataset.delIndex);
-
-          state.packLists[day].splice(index, 1);
-
-          save("packLists", state.packLists);
-          renderSchedule();
-        });
-      });
-
-      document.querySelectorAll("[data-reset-pack]").forEach(button => {
-        button.addEventListener("click", () => {
-          state.packLists[button.dataset.resetPack] = [
-            ...defaultPackLists[button.dataset.resetPack]
-          ];
-
-          save("packLists", state.packLists);
-          renderSchedule();
-          showToast("Pack list reset.");
-        });
-      });
-
-      const addButton = document.getElementById("packAddBtn");
-      const addInput = document.getElementById("packAddInput");
-
-      function addItem() {
-        const value = addInput.value.trim();
-
-        if (!value) return;
-
-        state.packLists[state.activeDay].push(value);
-
-        save("packLists", state.packLists);
-
-        addInput.value = "";
-        renderSchedule();
-      }
-
-      addButton?.addEventListener("click", addItem);
-
-      addInput?.addEventListener("keydown", event => {
-        if (event.key === "Enter") addItem();
-      });
-    }
-
-    function updateStatus() {
-      const tag = document.getElementById("statusTag");
-      const title = document.getElementById("countdownTitle");
-      const timer = document.getElementById("countdownTimer");
-      const subtext = document.getElementById("countdownSubtext");
-      const leaveRow = document.getElementById("leaveRow");
-      const progressContainer = document.getElementById("progressContainer");
-      const progressBar = document.getElementById("progressBar");
-
-      const now = new Date();
-      const todayName = DAY_NAMES[now.getDay()];
-      const todayClasses = schedule[todayName] || [];
-
-      tag.classList.remove("in-class");
-      leaveRow.style.display = "none";
-      progressContainer.style.display = "none";
-
-      if (isNoClassDate(now)) {
-        tag.textContent = "Day Off";
-        title.textContent = noteForDate(now) || "No classes today";
-        timer.textContent = "Relax";
-        subtext.textContent = "No campus moves needed right now.";
-        return;
-      }
-
-      for (let index = 0; index < todayClasses.length; index++) {
-        const classItem = todayClasses[index];
-        const start = parseTime(classItem.start, now);
-        const end = parseTime(classItem.end, now);
-
-        if (now >= start && now <= end) {
-          tag.textContent = "Live Now";
-          tag.classList.add("in-class");
-
-          title.textContent = classItem.title;
-          timer.textContent = formatHMS((end - now) / 1000);
-          subtext.textContent = `Ends at ${formatClock(end)} · ${classItem.room}`;
-
-          progressContainer.style.display = "block";
-          progressBar.style.width = `${((now - start) / (end - start)) * 100}%`;
-
-          return;
-        }
-
-        if (now < start) {
-          const fromKey = originForClass(todayName, index);
-
-          const travelTime = alreadyThere(classItem.buildingKey)
-            ? 0
-            : walkMinutes(fromKey, classItem.buildingKey);
-
-          const leaveAt = new Date(start.getTime() - travelTime * 60000);
-          const secondsUntil = Math.max(0, Math.floor((start - now) / 1000));
-
-          tag.textContent = travelTime <= 5 ? "Up Next" : "Transit";
-          title.textContent = classItem.title;
-          timer.textContent = formatHMS(secondsUntil);
-          subtext.textContent = `Starts at ${formatClock(start)} · ${classItem.room}`;
-
-          leaveRow.style.display = "inline-flex";
-          leaveRow.textContent = `Leave by ${formatClock(leaveAt)} · ${travelTime} min travel`;
-
-          maybeNotify(classItem, leaveAt);
-
-          return;
-        }
-      }
-
-      tag.textContent = "Done";
-      title.textContent = "Classes finished for today";
-      timer.textContent = "Free";
-      subtext.textContent = "You are clear for the rest of the day.";
-    }
-
-    function maybeNotify(classItem, leaveAt) {
-      if (!("Notification" in window)) return;
-      if (Notification.permission !== "granted") return;
-
-      const key = `${ymd(new Date())}:${classItem.id}`;
-      const now = Date.now();
-
-      if (state.notified[key]) return;
-
-      if (
-        now >= leaveAt.getTime() - 30000 &&
-        now <= leaveAt.getTime() + 120000
-      ) {
-        new Notification("Class Navigator", {
-          body: `Leave now for ${classItem.title} — ${classItem.room}`,
-          tag: key,
-          renotify: false
-        });
-
-        state.notified[key] = true;
-        save("navNotified", state.notified);
-      }
+      applyTheme(currentTheme === "dark" ? "light" : "dark");
     }
 
     async function enableNotifications() {
       if (!("Notification" in window)) {
-        showToast("Notifications are not supported in this browser.");
+        showToast("Notifications are not available in this browser.");
         return;
       }
 
       const isIOS =
         /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        (
+          navigator.platform === "MacIntel" &&
+          navigator.maxTouchPoints > 1
+        );
 
       const isStandalone =
         window.matchMedia("(display-mode: standalone)").matches ||
@@ -1844,36 +1971,52 @@
 
       if (isIOS && !isStandalone) {
         showToast(
-          "On iPhone, add this page to the Home Screen first, then open it from there to allow notifications."
+          "On iPhone, add this site to Home Screen first, then open it there to enable reminders."
         );
         return;
       }
 
       if (Notification.permission === "granted") {
-        document.getElementById("notifyBtn").textContent = "Reminders enabled";
-        showToast("Reminders are already enabled.");
+        document.getElementById("notifyBtn").textContent =
+          "Class reminders enabled";
+
+        showToast("Class reminders are already enabled.");
         return;
       }
 
       const permission = await Notification.requestPermission();
 
       if (permission === "granted") {
-        document.getElementById("notifyBtn").textContent = "Reminders enabled";
+        document.getElementById("notifyBtn").textContent =
+          "Class reminders enabled";
+
         showToast("Class reminders enabled.");
       } else {
         showToast("Notification permission was not granted.");
       }
     }
 
+    function nextWeekdayDate(dayName) {
+      const targetDay = DAY_NAMES.indexOf(dayName);
+      const date = new Date(`${TERM_START}T09:00:00`);
+
+      const difference =
+        (targetDay - date.getDay() + 7) % 7;
+
+      date.setDate(date.getDate() + difference);
+
+      return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
+    }
+
     function exportICS() {
-      const lines = [
+      const calendarLines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
         "PRODID:-//Class Navigator//EN",
         "CALSCALE:GREGORIAN"
       ];
 
-      const dayCode = {
+      const dayCodes = {
         Monday: "MO",
         Tuesday: "TU",
         Wednesday: "WE",
@@ -1881,61 +2024,56 @@
         Friday: "FR"
       };
 
-      Object.entries(schedule).forEach(([day, entries]) => {
-        entries.forEach((classItem, index) => {
-          const firstDate = nextWeekdayDate(day);
+      Object.entries(schedule).forEach(([dayName, classes]) => {
+        classes.forEach((classItem, index) => {
+          const date = nextWeekdayDate(dayName);
 
           const [startHour, startMinute] = classItem.start.split(":");
           const [endHour, endMinute] = classItem.end.split(":");
 
-          const start = `${firstDate}T${startHour}${startMinute}00`;
-          const end = `${firstDate}T${endHour}${endMinute}00`;
-
-          lines.push("BEGIN:VEVENT");
-          lines.push(`UID:${day}-${index}@classnav`);
-          lines.push(`DTSTART:${start}`);
-          lines.push(`DTEND:${end}`);
-          lines.push(`RRULE:FREQ=WEEKLY;BYDAY=${dayCode[day]};UNTIL=${TERM_END}`);
-          lines.push(`SUMMARY:${classItem.title}`);
-          lines.push(`LOCATION:${classItem.room}`);
-          lines.push("END:VEVENT");
+          calendarLines.push("BEGIN:VEVENT");
+          calendarLines.push(`UID:${dayName}-${index}@classnavigator`);
+          calendarLines.push(`DTSTART:${date}T${startHour}${startMinute}00`);
+          calendarLines.push(`DTEND:${date}T${endHour}${endMinute}00`);
+          calendarLines.push(
+            `RRULE:FREQ=WEEKLY;BYDAY=${dayCodes[dayName]};UNTIL=20261211T235959`
+          );
+          calendarLines.push(`SUMMARY:${classItem.title}`);
+          calendarLines.push(`LOCATION:${classItem.room}`);
+          calendarLines.push("END:VEVENT");
         });
       });
 
-      lines.push("END:VCALENDAR");
+      calendarLines.push("END:VCALENDAR");
 
-      const blob = new Blob([lines.join("\r\n")], {
-        type: "text/calendar"
-      });
+      const blob = new Blob(
+        [calendarLines.join("\r\n")],
+        { type: "text/calendar" }
+      );
 
       const link = document.createElement("a");
+
       link.href = URL.createObjectURL(blob);
       link.download = "class-navigator.ics";
+
+      document.body.appendChild(link);
       link.click();
+      link.remove();
 
       URL.revokeObjectURL(link.href);
     }
 
-    function nextWeekdayDate(dayName) {
-      const targetDay = DAY_NAMES.indexOf(dayName);
-      const base = new Date(`${TERM_START}T09:00:00`);
-
-      const difference = (targetDay - base.getDay() + 7) % 7;
-
-      base.setDate(base.getDate() + difference);
-
-      return `${base.getFullYear()}${String(base.getMonth() + 1).padStart(2, "0")}${String(base.getDate()).padStart(2, "0")}`;
-    }
-
-    function userSelectDay(day) {
-      state.activeDay = day;
+    function userSelectDay(dayName) {
+      state.activeDay = dayName;
       state.isUserSelected = true;
+
       refreshUI();
     }
 
     function jumpToToday() {
       state.activeDay = todayScheduleName();
       state.isUserSelected = false;
+
       refreshUI();
     }
 
@@ -1949,46 +2087,66 @@
         noteForDate(new Date()) || "";
     }
 
-    function toggleTheme() {
-      const root = document.documentElement;
-      const isHighContrast = root.dataset.contrast === "high";
-
-      if (isHighContrast) {
-        root.dataset.contrast = "normal";
-        root.style.setProperty("--panel", "rgba(20, 24, 33, 0.72)");
-        root.style.setProperty("--purple", "#7d63ff");
-        showToast("Higher-contrast mode off.");
-      } else {
-        root.dataset.contrast = "high";
-        root.style.setProperty("--panel", "rgba(23, 28, 40, 0.82)");
-        root.style.setProperty("--purple", "#8f7cff");
-        showToast("Higher-contrast mode on.");
-      }
-    }
-
-    function bindControls() {
+    function setupEventListeners() {
       document.querySelectorAll(".day-btn").forEach(button => {
         button.addEventListener("click", () => {
           userSelectDay(button.dataset.day);
         });
       });
 
-      document.getElementById("jumpTodayBtn").addEventListener("click", jumpToToday);
-      document.getElementById("themeBtn").addEventListener("click", toggleTheme);
-      document.getElementById("notifyBtn").addEventListener("click", enableNotifications);
-      document.getElementById("calendarBtn").addEventListener("click", exportICS);
+      document
+        .getElementById("jumpTodayBtn")
+        .addEventListener("click", jumpToToday);
+
+      document
+        .getElementById("themeBtn")
+        .addEventListener("click", toggleTheme);
+
+      document
+        .getElementById("notifyBtn")
+        .addEventListener("click", enableNotifications);
+
+      document
+        .getElementById("calendarBtn")
+        .addEventListener("click", exportICS);
+
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", () => {
+          if (state.theme === "auto") {
+            applyTheme("auto");
+          }
+        });
     }
 
-    initState();
-    bindControls();
-    refreshUI();
-    fetchWeather();
-    maybeTrackGPS();
-    updateStatus();
+    function startApp() {
+      state.packLists = load(
+        "packLists",
+        JSON.parse(JSON.stringify(defaultPackLists))
+      );
 
-    setInterval(updateStatus, 1000);
-    setInterval(maybeTrackGPS, 60000);
-    setInterval(fetchWeather, 15 * 60 * 1000);
+      state.notified = load("navNotified", {});
+      state.activeDay = todayScheduleName();
+
+      const savedTheme = load("classNavTheme", "auto");
+
+      applyTheme(savedTheme);
+
+      document.getElementById("headerDate").textContent =
+        formatDate(new Date());
+
+      setupEventListeners();
+      refreshUI();
+      fetchWeather();
+      maybeTrackGPS();
+      updateStatus();
+
+      setInterval(updateStatus, 1000);
+      setInterval(maybeTrackGPS, 60000);
+      setInterval(fetchWeather, 15 * 60 * 1000);
+    }
+
+    startApp();
   </script>
 </body>
 </html>
