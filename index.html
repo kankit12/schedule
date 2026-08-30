@@ -1,1520 +1,1994 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#592A8A">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Class Nav">
-    <title>Class Navigator - ECU</title>
-    <link rel="manifest" id="manifestLink">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --ecu-purple: #592A8A;
-            --ecu-purple-dark: #3D1C60;
-            --ecu-purple-light: rgba(89, 42, 138, 0.08);
-            --ecu-gold: #FDC82F;
-            --bg-canvas: #F8FAFC;
-            --surface: #FFFFFF;
-            --text-primary: #0F172A;
-            --text-secondary: #475569;
-            --text-muted: #94A3B8;
-            --border-subtle: #E2E8F0;
-            --radius-card: 20px;
-            --radius-btn: 12px;
-            --shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.03), 0 4px 12px rgba(15, 23, 42, 0.04);
-            --shadow-active: 0 8px 20px rgba(89, 42, 138, 0.2);
-            --live-green: #10B981;
-            --live-green-bg: rgba(16, 185, 129, 0.1);
-            --alert-bg: #FEF2F2;
-            --alert-text: #B91C1C;
-            --sprint-amber: #D97706;
-            --sprint-amber-bg: rgba(217, 119, 6, 0.12);
-            --chem: #7C3AED;
-            --biol: #0D9488;
-            --hlth: #2563EB;
-            --hnrs: #D97706;
-        }
-
-        body.dark-mode {
-            --bg-canvas: #0F172A;
-            --surface: #1E293B;
-            --text-primary: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
-            --border-subtle: #334155;
-            --ecu-purple-light: rgba(139, 92, 246, 0.15);
-            --alert-bg: rgba(185, 28, 28, 0.2);
-            --alert-text: #FCA5A5;
-            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-canvas);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 24px 16px 40px;
-            -webkit-font-smoothing: antialiased;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation: none !important; transition: none !important; }
-        }
-
-        .layout-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: 480px;
-            margin: 0 auto;
-            gap: 24px;
-        }
-
-        @media (min-width: 900px) {
-            .layout-wrapper {
-                flex-direction: row-reverse;
-                max-width: 960px;
-                align-items: flex-start;
-                padding-top: 40px;
-            }
-            .app-container { flex: 1; min-width: 500px; }
-            .sidebar { width: 340px; position: sticky; top: 40px; }
-        }
-
-        header {
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-actions { display: flex; align-items: center; gap: 8px; }
-
-        .toggle-btn {
-            background: var(--surface);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-primary);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: var(--shadow-subtle);
-            font-family: inherit;
-        }
-
-        .toggle-btn.sprint-active {
-            background: var(--ecu-gold);
-            color: #000;
-            border-color: #EAB308;
-            font-weight: 800;
-        }
-
-        .brand-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--ecu-purple);
-            background: var(--ecu-purple-light);
-            padding: 6px 12px;
-            border-radius: 20px;
-        }
-
-        .brand-badge::before {
-            content: "";
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: var(--ecu-gold);
-        }
-
-        h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
-
-        .week-strip {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-
-        .week-cell {
-            background: var(--surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 8px 4px;
-            text-align: center;
-            cursor: pointer;
-            font-family: inherit;
-            color: var(--text-secondary);
-        }
-
-        .week-cell strong { display: block; font-size: 1rem; color: var(--text-primary); font-weight: 800; }
-        .week-cell small { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-        .week-cell.is-today { border-color: var(--ecu-purple); }
-        .week-cell.is-active { background: var(--ecu-purple); color: #fff; }
-        .week-cell.is-active strong { color: #fff; }
-
-        .viewing-chip {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            background: var(--ecu-purple-light);
-            color: var(--ecu-purple);
-            border-radius: 12px;
-            padding: 8px 12px;
-            margin-bottom: 12px;
-            font-size: 0.8125rem;
-            font-weight: 700;
-        }
-
-        .viewing-chip.show { display: flex; }
-        body.dark-mode .viewing-chip { color: #C084FC; }
-
-        .viewing-chip button {
-            border: none;
-            background: var(--ecu-purple);
-            color: #fff;
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .status-banner {
-            background: linear-gradient(135deg, var(--ecu-purple) 0%, var(--ecu-purple-dark) 100%);
-            color: white;
-            border-radius: var(--radius-card);
-            padding: 22px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow-active);
-            overflow: hidden;
-        }
-
-        .status-banner.sprint-alert,
-        .status-banner.rain-alert,
-        .status-banner.leave-now {
-            background: linear-gradient(135deg, #7C2D12 0%, #451A03 100%);
-            border: 2px solid var(--ecu-gold);
-        }
-
-        .status-banner.leave-now { animation: leavePulse 1.6s ease-in-out infinite; }
-
-        @keyframes leavePulse {
-            0%, 100% { box-shadow: 0 8px 20px rgba(89, 42, 138, 0.2); }
-            50% { box-shadow: 0 0 0 6px rgba(253, 200, 47, 0.25); }
-        }
-
-        .status-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            gap: 8px;
-        }
-
-        .status-tag {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .status-tag.in-class {
-            background: var(--live-green-bg);
-            color: #34D399;
-            border: 1px solid rgba(52, 211, 153, 0.3);
-        }
-
-        .countdown-title {
-            font-size: 1rem;
-            font-weight: 600;
-            opacity: 0.9;
-            margin-bottom: 12px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .countdown-timer {
-            font-size: 2.25rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            font-variant-numeric: tabular-nums;
-            line-height: 1;
-        }
-
-        .countdown-subtext {
-            font-size: 0.8125rem;
-            opacity: 0.75;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-
-        .leave-row {
-            margin-top: 10px;
-            font-size: 0.8125rem;
-            font-weight: 700;
-            background: rgba(255,255,255,0.12);
-            display: inline-flex;
-            padding: 6px 10px;
-            border-radius: 999px;
-        }
-
-        .progress-container {
-            margin-top: 16px;
-            background: rgba(255, 255, 255, 0.2);
-            height: 6px;
-            border-radius: 4px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .progress-bar { height: 100%; background: var(--live-green); width: 0%; transition: width 1s linear; }
-
-        .utility-card {
-            background: var(--surface);
-            border-radius: var(--radius-card);
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .utility-header {
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 12px;
-        }
-
-        .utility-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            background: var(--ecu-purple-light);
-            border-radius: var(--radius-btn);
-            color: var(--ecu-purple);
-            font-weight: 700;
-            font-size: 0.875rem;
-            margin-bottom: 8px;
-            border: none;
-            width: 100%;
-            font-family: inherit;
-            cursor: pointer;
-        }
-
-        body.dark-mode .utility-btn { color: #C084FC; }
-
-        .weather-info {
-            font-size: 0.875rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            background: var(--bg-canvas);
-            border-radius: var(--radius-btn);
-            margin-bottom: 8px;
-        }
-
-        .hourly-row {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            margin-top: 8px;
-        }
-
-        .hourly-chip {
-            background: var(--bg-canvas);
-            border-radius: 10px;
-            padding: 8px 4px;
-            text-align: center;
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-        }
-
-        .hourly-chip strong { display: block; color: var(--text-primary); font-size: 0.75rem; }
-
-        .day-selector {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-            background: var(--surface);
-            padding: 4px;
-            border-radius: 14px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .day-btn {
-            border: none;
-            padding: 10px 0;
-            border-radius: 10px;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 700;
-            font-size: 0.875rem;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .day-btn.active {
-            background-color: var(--ecu-purple);
-            color: white;
-            box-shadow: 0 2px 8px rgba(89, 42, 138, 0.3);
-        }
-
-        .class-card, .pack-card {
-            background: var(--surface);
-            border-radius: var(--radius-card);
-            padding: 20px;
-            margin-bottom: 14px;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .class-card { border-left: 4px solid var(--ecu-purple); }
-        .class-card.course-chem { border-left-color: var(--chem); }
-        .class-card.course-biol { border-left-color: var(--biol); }
-        .class-card.course-hlth { border-left-color: var(--hlth); }
-        .class-card.course-hnrs { border-left-color: var(--hnrs); }
-        .class-card.is-active-class {
-            border: 2px solid var(--ecu-purple);
-            border-left-width: 4px;
-            box-shadow: 0 4px 16px rgba(89, 42, 138, 0.12);
-        }
-        .class-card.is-past { opacity: 0.55; }
-
-        .pack-card { background: var(--ecu-purple-light); }
-
-        .card-kicker {
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--text-secondary);
-        }
-
-        .pack-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .pack-head button {
-            border: none;
-            background: var(--surface);
-            color: var(--text-secondary);
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            gap: 8px;
-        }
-
-        .class-time {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--bg-canvas);
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .walk-badge, .exam-badge, .done-badge {
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 12px;
-            background: var(--bg-canvas);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-subtle);
-            white-space: nowrap;
-        }
-
-        .walk-badge.sprint-badge, .walk-badge.tight-badge {
-            background: var(--sprint-amber-bg);
-            color: var(--sprint-amber);
-            border-color: rgba(217, 119, 6, 0.3);
-        }
-
-        .exam-badge {
-            background: var(--alert-bg);
-            color: var(--alert-text);
-            border-color: transparent;
-            margin-bottom: 8px;
-            display: inline-flex;
-        }
-
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: var(--live-green);
-            background: var(--live-green-bg);
-            padding: 3px 8px;
-            border-radius: 12px;
-            text-transform: uppercase;
-        }
-
-        .live-badge::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: var(--live-green);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .class-title {
-            font-size: 1.0625rem;
-            font-weight: 700;
-            line-height: 1.35;
-            margin-bottom: 10px;
-        }
-
-        .class-location {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        .checklist-container {
-            background: var(--alert-bg);
-            color: var(--alert-text);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-
-        .checklist-title {
-            font-size: 0.8125rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-        }
-
-        .checklist-items { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-
-        .checklist-item, .pack-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8125rem;
-            font-weight: 600;
-        }
-
-        .pack-items { display: grid; gap: 8px; }
-
-        .pack-item input[type="checkbox"], .checklist-item input {
-            accent-color: var(--ecu-purple);
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-        }
-
-        .pack-item input[type="text"] {
-            flex: 1;
-            border: 1px solid var(--border-subtle);
-            background: var(--surface);
-            color: var(--text-primary);
-            border-radius: 8px;
-            padding: 8px 10px;
-            font-family: inherit;
-            font-size: 0.8125rem;
-            font-weight: 600;
-        }
-
-        .pack-item .del {
-            border: none;
-            background: transparent;
-            color: var(--alert-text);
-            font-weight: 800;
-            cursor: pointer;
-            font-size: 1rem;
-            line-height: 1;
-            padding: 4px;
-        }
-
-        .pack-add {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .pack-add input {
-            flex: 1;
-            border: 1px solid var(--border-subtle);
-            background: var(--surface);
-            color: var(--text-primary);
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-family: inherit;
-            font-size: 0.8125rem;
-            font-weight: 600;
-        }
-
-        .pack-add button, .nav-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 14px;
-            background-color: var(--ecu-purple);
-            color: white;
-            text-decoration: none;
-            border-radius: var(--radius-btn);
-            font-weight: 700;
-            font-size: 0.875rem;
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .nav-btn { width: 100%; padding: 12px 16px; }
-        .nav-btn.sprint-btn { background-color: var(--sprint-amber); }
-        .nav-btn.ghost {
-            background: var(--surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border-subtle);
-        }
-        .nav-row { display: grid; gap: 8px; }
-        .nav-row.two { grid-template-columns: 1fr 1fr; }
-        .nav-btn:active { transform: scale(0.98); }
-
-        .empty-state {
-            text-align: center;
-            padding: 48px 24px;
-            background: var(--surface);
-            border-radius: var(--radius-card);
-            border: 1px dashed var(--border-subtle);
-            color: var(--text-secondary);
-        }
-
-        .holiday-note {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 24px;
-            transform: translateX(-50%) translateY(120%);
-            background: #111827;
-            color: #fff;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            font-weight: 700;
-            z-index: 50;
-            transition: transform 0.25s ease;
-            max-width: 90vw;
-        }
-
-        .toast.show { transform: translateX(-50%) translateY(0); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0f14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Class Nav">
+  <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">
+  <title>Class Navigator - ECU</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #090b10;
+      --panel: rgba(20, 24, 33, 0.72);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text: #f5f7ff;
+      --muted: #a8b0c4;
+      --purple: #7d63ff;
+      --purple-2: #5b43dc;
+      --blue: #8cb8ff;
+      --green: #3ddc97;
+      --gold: #ffcf74;
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.42);
+      --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.26);
+      --shadow-sm: 0 8px 18px rgba(0, 0, 0, 0.18);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --safe-top: max(env(safe-area-inset-top), 14px);
+      --safe-bottom: max(env(safe-area-inset-bottom), 18px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100dvh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(125, 99, 255, 0.28), transparent 32%),
+        radial-gradient(circle at 100% 0%, rgba(140, 184, 255, 0.16), transparent 28%),
+        linear-gradient(180deg, #12141b 0%, #090b10 100%);
+      padding: calc(var(--safe-top) + 8px) 14px calc(var(--safe-bottom) + 22px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    a {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid rgba(140, 184, 255, 0.8);
+      outline-offset: 2px;
+    }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    @media (min-width: 980px) {
+      .shell {
+        grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.72fr);
+        align-items: start;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 18px;
+      }
+    }
+
+    .app,
+    .utility-card,
+    .class-card,
+    .pack-card,
+    .empty-state {
+      border-radius: var(--radius-xl);
+    }
+
+    .app {
+      padding: 18px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.05),
+        rgba(255, 255, 255, 0.025)
+      );
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: saturate(180%) blur(28px);
+      -webkit-backdrop-filter: saturate(180%) blur(28px);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #fff3c8);
+      box-shadow: 0 0 18px rgba(255, 207, 116, 0.5);
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 1.45rem + 1vw, 2.35rem);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 28ch;
+      line-height: 1.45;
+    }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.055);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    .week-strip,
+    .day-selector {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .week-strip {
+      margin-bottom: 12px;
+    }
+
+    .week-cell,
+    .day-btn {
+      min-height: 56px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .week-cell {
+      padding: 10px 4px;
+      text-align: center;
+    }
+
+    .week-cell small {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .week-cell strong {
+      display: block;
+      font-size: 16px;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    .week-cell.is-today {
+      border-color: rgba(125, 99, 255, 0.42);
+    }
+
+    .week-cell.is-active,
+    .day-btn.active {
+      color: #fff;
+      background: linear-gradient(
+        180deg,
+        rgba(125, 99, 255, 0.96),
+        rgba(91, 67, 220, 0.98)
+      );
+      border-color: rgba(174, 160, 255, 0.45);
+      box-shadow: 0 14px 28px rgba(91, 67, 220, 0.34);
+    }
+
+    .holiday-note {
+      min-height: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .viewing-chip {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(140, 184, 255, 0.08);
+      border: 1px solid rgba(140, 184, 255, 0.14);
+      color: #dbe8ff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .viewing-chip.show {
+      display: flex;
+    }
+
+    .viewing-chip button {
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .status-banner {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+      padding: 20px;
+      border-radius: 30px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(125, 99, 255, 0.42),
+          rgba(17, 19, 24, 0.58) 44%,
+          rgba(140, 184, 255, 0.18)
+        ),
+        rgba(19, 22, 28, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .status-banner::after {
+      content: "";
+      position: absolute;
+      right: -50px;
+      bottom: -90px;
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(125, 99, 255, 0.42), transparent 70%);
+      filter: blur(14px);
+      pointer-events: none;
+    }
+
+    .status-header,
+    .pack-head,
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-header {
+      margin-bottom: 10px;
+    }
+
+    .status-tag {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .status-tag.in-class {
+      background: rgba(61, 220, 151, 0.12);
+      color: #baf5d8;
+      border-color: rgba(61, 220, 151, 0.24);
+    }
+
+    .countdown-title {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.86);
+      margin-bottom: 10px;
+    }
+
+    .countdown-timer {
+      font-size: clamp(2.35rem, 2rem + 2vw, 3.35rem);
+      line-height: 0.94;
+      letter-spacing: -0.08em;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown-subtext {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .leave-row {
+      display: none;
+      margin-top: 12px;
+      width: fit-content;
+      min-height: 38px;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.09);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .progress-container {
+      display: none;
+      margin-top: 16px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--green), #82efbd);
+    }
+
+    .day-selector {
+      padding: 6px;
+      margin-bottom: 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .day-btn {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .utility-card,
+    .class-card,
+    .pack-card,
+    .empty-state {
+      padding: 18px;
+      background: rgba(18, 22, 30, 0.78);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: saturate(180%) blur(24px);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+    }
+
+    .utility-header,
+    .card-kicker,
+    .checklist-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+
+    .utility-header {
+      margin-bottom: 12px;
+    }
+
+    .weather-info {
+      min-height: 54px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 15px;
+      margin-bottom: 10px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .weather-info strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .hourly-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 8px 0 14px;
+    }
+
+    .hourly-chip {
+      padding: 10px 6px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .hourly-chip strong {
+      display: block;
+      margin: 2px 0;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .utility-btn,
+    .nav-btn {
+      width: 100%;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .utility-btn.primary,
+    .nav-btn.primary {
+      background: linear-gradient(
+        180deg,
+        rgba(125, 99, 255, 0.95),
+        rgba(91, 67, 220, 0.98)
+      );
+      border-color: rgba(174, 160, 255, 0.42);
+      box-shadow: 0 16px 30px rgba(91, 67, 220, 0.34);
+    }
+
+    .utility-btn + .utility-btn {
+      margin-top: 10px;
+    }
+
+    .pack-card {
+      margin-bottom: 14px;
+      background: linear-gradient(
+        180deg,
+        rgba(125, 99, 255, 0.13),
+        rgba(255, 255, 255, 0.03)
+      );
+      border-color: rgba(125, 99, 255, 0.18);
+    }
+
+    .pack-head {
+      margin: 10px 0 12px;
+    }
+
+    .pack-head button {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .pack-items,
+    .checklist-items {
+      display: grid;
+      gap: 10px;
+    }
+
+    .checklist-items {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pack-item,
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #edf2ff;
+    }
+
+    .pack-item input[type="checkbox"],
+    .checklist-item input {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--purple);
+      flex-shrink: 0;
+    }
+
+    .pack-item input[type="text"],
+    .pack-add input {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border-strong);
+      background: rgba(255, 255, 255, 0.055);
+      color: var(--text);
+    }
+
+    .pack-item .del {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      border: 0;
+      background: rgba(255, 122, 144, 0.1);
+      color: #ffc0cc;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .pack-add {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .class-card {
+      margin-bottom: 14px;
+    }
+
+    .class-card.is-active-class {
+      border-color: rgba(125, 99, 255, 0.34);
+      background: linear-gradient(
+        180deg,
+        rgba(125, 99, 255, 0.1),
+        rgba(18, 22, 30, 0.86)
+      );
+      box-shadow: 0 18px 34px rgba(91, 67, 220, 0.2);
+    }
+
+    .class-card.is-past {
+      opacity: 0.6;
+    }
+
+    .card-header {
+      margin-bottom: 12px;
+    }
+
+    .class-time,
+    .walk-badge,
+    .live-badge {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .class-time {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .walk-badge {
+      background: rgba(140, 184, 255, 0.1);
+      border: 1px solid rgba(140, 184, 255, 0.15);
+      color: #d7e7ff;
+    }
+
+    .live-badge {
+      gap: 6px;
+      background: rgba(61, 220, 151, 0.12);
+      color: #baf5d8;
+      margin-bottom: 8px;
+    }
+
+    .live-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 12px currentColor;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.45;
+        transform: scale(1.18);
+      }
+    }
+
+    .class-title {
+      font-size: 17px;
+      line-height: 1.3;
+      letter-spacing: -0.03em;
+      font-weight: 750;
+      margin-bottom: 10px;
+    }
+
+    .class-location {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .checklist-container {
+      padding: 14px;
+      margin-bottom: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid var(--border);
+    }
+
+    .checklist-title {
+      color: #ffdce3;
+      margin-bottom: 10px;
+    }
+
+    .nav-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav-row.two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 20px;
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--text);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(var(--safe-bottom) + 8px);
+      transform: translate(-50%, 130%);
+      min-width: min(92vw, 340px);
+      max-width: 92vw;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(20, 24, 32, 0.92);
+      color: #fff;
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 999;
+      transition: transform 0.22s ease;
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+    }
+
+    @media (hover: hover) {
+      .icon-btn:hover,
+      .utility-btn:hover,
+      .nav-btn:hover,
+      .week-cell:hover,
+      .day-btn:hover,
+      .pack-head button:hover,
+      .viewing-chip button:hover {
+        transform: translateY(-1px);
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+    }
+
+    .icon-btn:active,
+    .utility-btn:active,
+    .nav-btn:active,
+    .week-cell:active,
+    .day-btn:active,
+    .pack-head button:active,
+    .viewing-chip button:active {
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 560px) {
+      .app,
+      .utility-card,
+      .class-card,
+      .pack-card {
+        padding: 16px;
+      }
+
+      .subtitle {
+        max-width: none;
+      }
+
+      .hourly-row {
+        overflow-x: auto;
+        grid-template-columns: repeat(5, minmax(54px, 1fr));
+      }
+
+      .checklist-items,
+      .nav-row.two,
+      .pack-add {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .pack-add {
+        gap: 10px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="layout-wrapper">
-        <aside class="sidebar">
-            <div class="utility-card">
-                <div class="utility-header">Live Conditions</div>
-                <div class="weather-info" id="weatherWidget"><span>Loading weather...</span></div>
-                <div class="weather-info" id="gpsWidget" style="font-size:0.75rem;color:var(--text-secondary);">
-                    <span>GPS Distance: Not tracked</span>
-                </div>
-                <div class="hourly-row" id="hourlyRow"></div>
-                <div class="holiday-note" id="calendarNote"></div>
-                <button class="utility-btn" onclick="enableNotifications()" id="notifyBtn">Enable class alerts</button>
-                <button class="utility-btn" onclick="exportICS()">Export schedule (.ics)</button>
-                <button class="utility-btn" onclick="installPWA()" id="installBtn">Add to Home Screen</button>
-            </div>
-        </aside>
-
-        <div class="app-container">
-            <header>
-                <h1>Class Navigator</h1>
-                <div class="header-actions">
-                    <button class="toggle-btn" onclick="toggleSprintMode()" id="sprintBtn">Sprint</button>
-                    <button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">Dark</button>
-                    <div class="brand-badge">ECU</div>
-                </div>
-            </header>
-
-            <div class="week-strip" id="weekStrip"></div>
-            <div class="holiday-note" id="weekHoliday"></div>
-
-            <div class="viewing-chip" id="viewingChip">
-                <span id="viewingText">Viewing another day</span>
-                <button type="button" onclick="jumpToToday()">Jump to today</button>
-            </div>
-
-            <div class="status-banner" id="statusBanner">
-                <div class="status-header">
-                    <span class="status-tag" id="statusTag">Schedule Tracker</span>
-                </div>
-                <div class="countdown-title" id="countdownTitle">Loading schedule...</div>
-                <div class="countdown-timer" id="countdownTimer">--:--:--</div>
-                <div class="countdown-subtext" id="countdownSubtext">Calculating time remaining</div>
-                <div class="leave-row" id="leaveRow" style="display:none;"></div>
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-            </div>
-
-            <nav class="day-selector" id="daySelector">
-                <button class="day-btn" onclick="userSelectDay('Monday')">Mon</button>
-                <button class="day-btn" onclick="userSelectDay('Tuesday')">Tue</button>
-                <button class="day-btn" onclick="userSelectDay('Wednesday')">Wed</button>
-                <button class="day-btn" onclick="userSelectDay('Thursday')">Thu</button>
-                <button class="day-btn" onclick="userSelectDay('Friday')">Fri</button>
-            </nav>
-
-            <main id="scheduleContainer" aria-live="polite"></main>
+  <div class="shell">
+    <main class="app">
+      <header>
+        <div>
+          <div class="eyebrow">ECU Flow</div>
+          <h1>Class Navigator</h1>
+          <p class="subtitle">
+            Cleaner iPhone styling, no sprint mode, no add-to-home-screen control,
+            and softer glassmorphism with better iOS spacing.
+          </p>
         </div>
-    </div>
-    <div class="toast" id="toast"></div>
 
-    <script>
-        const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const TERM_END = '20261211T235959';
-        const TERM_START = '2026-08-17';
+        <button class="icon-btn" id="themeBtn" aria-label="Toggle contrast mode">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </header>
 
-        const buildings = {
-            greene: { label: 'Greene Hall', maps: 'Greene Hall, East Carolina University', lat: 35.6056, lon: -77.3668 },
-            scitech: { label: 'Sci & Tech', maps: 'Science and Technology Building, East Carolina University', lat: 35.6085, lon: -77.3650 },
-            brewster: { label: 'Brewster', maps: 'Brewster Building, East Carolina University', lat: 35.6092, lon: -77.3705 },
-            austin: { label: 'Austin', maps: 'Austin Building, East Carolina University', lat: 35.6078, lon: -77.3680 },
-            rawl: { label: 'Rawl', maps: 'Rawl Building, East Carolina University', lat: 35.6080, lon: -77.3695 },
-            hsc: { label: 'Health Sciences', maps: 'Health Sciences Campus, East Carolina University', lat: 35.5870, lon: -77.3820 }
-        };
+      <div class="week-strip" id="weekStrip"></div>
+      <div class="holiday-note" id="weekHoliday"></div>
 
-        const walkMatrix = {
-            greene: { scitech: [8,4], brewster: [6,3], austin: [5,2], rawl: [7,3], hsc: [25,12] },
-            scitech: { brewster: [6,3], austin: [5,3], rawl: [6,3], hsc: [25,12] },
-            brewster: { austin: [4,2], rawl: [4,2], hsc: [24,12] },
-            austin: { rawl: [5,2], hsc: [24,12] },
-            rawl: { hsc: [23,12] }
-        };
+      <div class="viewing-chip" id="viewingChip">
+        <span id="viewingText">Viewing another day</span>
+        <button type="button" id="jumpTodayBtn">Jump to today</button>
+      </div>
 
-        const schedule = {
-            Monday: [
-                { id: 'mon-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'CHEM 1150: General Chemistry I', room: 'Sci & Tech, 0C307', buildingKey: 'scitech' },
-                { id: 'mon-2', time: '02:00 PM - 04:50 PM', start: '14:00', end: '16:50', title: 'BIOL 1101: Principles of Biology Lab I', room: 'Sci & Tech, 00339', buildingKey: 'scitech' }
-            ],
-            Tuesday: [
-                { id: 'tue-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'HLTH 1000: Health in Modern Society', room: 'Brewster, 0C302', buildingKey: 'brewster' },
-                { id: 'tue-2', time: '11:00 AM - 12:15 PM', start: '11:00', end: '12:15', title: 'HNRS 2011: BLS Sem in Human', room: 'Brewster, 0D207', buildingKey: 'brewster' },
-                { id: 'tue-3', time: '12:30 PM - 01:45 PM', start: '12:30', end: '13:45', title: 'BIOL 1100: Principles of Biology I', room: 'Austin, 00205', buildingKey: 'austin' },
-                { id: 'tue-4', time: '05:00 PM - 07:00 PM', start: '17:00', end: '19:00', title: 'HNRS 2000: Honors Leadership & Service Colloquium', room: 'Rawl, 00205', buildingKey: 'rawl' }
-            ],
-            Wednesday: [
-                { id: 'wed-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'CHEM 1150: General Chemistry I', room: 'Sci & Tech, 0C307', buildingKey: 'scitech' },
-                { id: 'wed-2', time: '11:00 AM - 01:50 PM', start: '11:00', end: '13:50', title: 'CHEM 1151: General Chemistry Lab I', room: 'Sci & Tech, 00432', buildingKey: 'scitech', checklist: ['Safety Goggles', 'Lab Coat', 'Long Pants', 'Closed-toe Shoes'] },
-                { id: 'wed-3', time: '03:30 PM - 06:30 PM', start: '15:30', end: '18:30', title: 'HNRS 2002: Survey of Health Professions', room: 'Health Sciences Campus', buildingKey: 'hsc' }
-            ],
-            Thursday: [
-                { id: 'thu-1', time: '11:00 AM - 12:15 PM', start: '11:00', end: '12:15', title: 'HNRS 2011: BLS Sem in Human', room: 'Brewster, 0D207', buildingKey: 'brewster' },
-                { id: 'thu-2', time: '12:30 PM - 01:45 PM', start: '12:30', end: '13:45', title: 'BIOL 1100: Principles of Biology I', room: 'Austin, 00205', buildingKey: 'austin' }
-            ],
-            Friday: [
-                { id: 'fri-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'CHEM 1150: General Chemistry I', room: 'Sci & Tech, 0C307', buildingKey: 'scitech' }
-            ]
-        };
+      <section class="status-banner" id="statusBanner">
+        <div class="status-header">
+          <span class="status-tag" id="statusTag">Schedule Tracker</span>
+        </div>
 
-        const defaultPackLists = {
-            Monday: ['Laptop + charger', 'CHEM 1150 notes', 'BIOL 1101 lab notebook'],
-            Tuesday: ['Laptop + charger', 'HLTH / HNRS readings', 'Evening: Rawl for HNRS 2000 at 5 PM'],
-            Wednesday: ['Safety goggles', 'Lab coat', 'Long pants', 'Closed-toe shoes', 'Pirate ID', 'Route 302 plan for Health Sciences'],
-            Thursday: ['Laptop + charger', 'HNRS 2011 + BIOL 1100 notes'],
-            Friday: ['Laptop + CHEM 1150 notes', 'Light day — 9 AM only']
-        };
+        <div class="countdown-title" id="countdownTitle">Loading schedule...</div>
+        <div class="countdown-timer" id="countdownTimer">--:--:--</div>
+        <div class="countdown-subtext" id="countdownSubtext">Calculating time remaining</div>
 
-        const exams = [];
+        <div class="leave-row" id="leaveRow"></div>
 
-        const noClassDates = new Set([
-            '2026-09-07',
-            '2026-10-05', '2026-10-06',
-            '2026-11-25', '2026-11-26', '2026-11-27'
-        ]);
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </section>
 
-        const academicNotes = [
-            { date: '2026-09-07', title: 'Labor Day — no classes' },
-            { date: '2026-10-05', title: 'Fall Break (Mon–Tue)' },
-            { date: '2026-11-25', title: 'Thanksgiving break starts' }
-        ];
+      <nav class="day-selector" aria-label="Select weekday">
+        <button class="day-btn" data-day="Monday">Mon</button>
+        <button class="day-btn" data-day="Tuesday">Tue</button>
+        <button class="day-btn" data-day="Wednesday">Wed</button>
+        <button class="day-btn" data-day="Thursday">Thu</button>
+        <button class="day-btn" data-day="Friday">Fri</button>
+      </nav>
 
-        function loadPackLists() {
-            try {
-                const saved = JSON.parse(localStorage.getItem('packLists') || 'null');
-                if (saved && typeof saved === 'object') {
-                    return {
-                        Monday: saved.Monday || [...defaultPackLists.Monday],
-                        Tuesday: saved.Tuesday || [...defaultPackLists.Tuesday],
-                        Wednesday: saved.Wednesday || [...defaultPackLists.Wednesday],
-                        Thursday: saved.Thursday || [...defaultPackLists.Thursday],
-                        Friday: saved.Friday || [...defaultPackLists.Friday]
-                    };
-                }
-            } catch (e) {}
-            return {
-                Monday: [...defaultPackLists.Monday],
-                Tuesday: [...defaultPackLists.Tuesday],
-                Wednesday: [...defaultPackLists.Wednesday],
-                Thursday: [...defaultPackLists.Thursday],
-                Friday: [...defaultPackLists.Friday]
-            };
+      <section id="scheduleContainer" aria-live="polite"></section>
+    </main>
+
+    <aside class="sidebar">
+      <section class="utility-card">
+        <div class="utility-header">Live Conditions</div>
+
+        <div class="weather-info" id="weatherWidget">
+          <span>Loading weather...</span>
+        </div>
+
+        <div class="weather-info" id="gpsWidget" style="font-size: 12px;">
+          <span>Location distance: not tracked</span>
+        </div>
+
+        <div class="hourly-row" id="hourlyRow"></div>
+        <div class="holiday-note" id="calendarNote"></div>
+
+        <button class="utility-btn primary" id="notifyBtn">Turn on reminders</button>
+        <button class="utility-btn" id="calendarBtn">Export schedule (.ics)</button>
+      </section>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const DAY_NAMES = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ];
+
+    const TERM_END = "20261211T235959";
+    const TERM_START = "2026-08-17";
+
+    const buildings = {
+      greene: {
+        label: "Greene Hall",
+        maps: "Greene Hall, East Carolina University",
+        lat: 35.6056,
+        lon: -77.3668
+      },
+      scitech: {
+        label: "Sci & Tech",
+        maps: "Science and Technology Building, East Carolina University",
+        lat: 35.6085,
+        lon: -77.3650
+      },
+      brewster: {
+        label: "Brewster",
+        maps: "Brewster Building, East Carolina University",
+        lat: 35.6092,
+        lon: -77.3705
+      },
+      austin: {
+        label: "Austin",
+        maps: "Austin Building, East Carolina University",
+        lat: 35.6078,
+        lon: -77.3680
+      },
+      rawl: {
+        label: "Rawl",
+        maps: "Rawl Building, East Carolina University",
+        lat: 35.6080,
+        lon: -77.3695
+      },
+      hsc: {
+        label: "Health Sciences",
+        maps: "Health Sciences Campus, East Carolina University",
+        lat: 35.5870,
+        lon: -77.3820
+      }
+    };
+
+    const walkMatrix = {
+      greene: {
+        scitech: [8],
+        brewster: [6],
+        austin: [5],
+        rawl: [7],
+        hsc: [25]
+      },
+      scitech: {
+        brewster: [6],
+        austin: [5],
+        rawl: [6],
+        hsc: [25]
+      },
+      brewster: {
+        austin: [4],
+        rawl: [4],
+        hsc: [24]
+      },
+      austin: {
+        rawl: [5],
+        hsc: [24]
+      },
+      rawl: {
+        hsc: [23]
+      }
+    };
+
+    const schedule = {
+      Monday: [
+        {
+          id: "mon-1",
+          time: "09:00 AM - 09:50 AM",
+          start: "09:00",
+          end: "09:50",
+          title: "CHEM 1150: General Chemistry I",
+          room: "Sci & Tech, 0C307",
+          buildingKey: "scitech"
+        },
+        {
+          id: "mon-2",
+          time: "02:00 PM - 04:50 PM",
+          start: "14:00",
+          end: "16:50",
+          title: "BIOL 1101: Principles of Biology Lab I",
+          room: "Sci & Tech, 00339",
+          buildingKey: "scitech"
         }
+      ],
 
-        let packLists = loadPackLists();
-
-        function savePackLists() {
-            localStorage.setItem('packLists', JSON.stringify(packLists));
+      Tuesday: [
+        {
+          id: "tue-1",
+          time: "09:00 AM - 09:50 AM",
+          start: "09:00",
+          end: "09:50",
+          title: "HLTH 1000: Health in Modern Society",
+          room: "Brewster, 0C302",
+          buildingKey: "brewster"
+        },
+        {
+          id: "tue-2",
+          time: "11:00 AM - 12:15 PM",
+          start: "11:00",
+          end: "12:15",
+          title: "HNRS 2011: BLS Sem in Human",
+          room: "Brewster, 0D207",
+          buildingKey: "brewster"
+        },
+        {
+          id: "tue-3",
+          time: "12:30 PM - 01:45 PM",
+          start: "12:30",
+          end: "13:45",
+          title: "BIOL 1100: Principles of Biology I",
+          room: "Austin, 00205",
+          buildingKey: "austin"
+        },
+        {
+          id: "tue-4",
+          time: "05:00 PM - 07:00 PM",
+          start: "17:00",
+          end: "19:00",
+          title: "HNRS 2000: Honors Leadership & Service Colloquium",
+          room: "Rawl, 00205",
+          buildingKey: "rawl"
         }
+      ],
 
-        let activeDay = '';
-        let isUserSelected = false;
-        let activeClassId = null;
-        let isSprintMode = localStorage.getItem('sprintMode') === 'true';
-        let currentPrecipitation = 0;
-        let hourlyForecast = [];
-        let lastGps = null;
-        let gpsDenied = false;
-        let lastGpsAt = 0;
-        let lastLeaveVibrateKey = '';
-        let deferredPrompt = null;
-        let notified = JSON.parse(localStorage.getItem('navNotified') || '{}');
-
-        function courseKey(title) {
-            if (title.startsWith('CHEM')) return 'chem';
-            if (title.startsWith('BIOL')) return 'biol';
-            if (title.startsWith('HLTH')) return 'hlth';
-            if (title.startsWith('HNRS')) return 'hnrs';
-            return 'other';
+      Wednesday: [
+        {
+          id: "wed-1",
+          time: "09:00 AM - 09:50 AM",
+          start: "09:00",
+          end: "09:50",
+          title: "CHEM 1150: General Chemistry I",
+          room: "Sci & Tech, 0C307",
+          buildingKey: "scitech"
+        },
+        {
+          id: "wed-2",
+          time: "11:00 AM - 01:50 PM",
+          start: "11:00",
+          end: "13:50",
+          title: "CHEM 1151: General Chemistry Lab I",
+          room: "Sci & Tech, 00432",
+          buildingKey: "scitech",
+          checklist: [
+            "Safety Goggles",
+            "Lab Coat",
+            "Long Pants",
+            "Closed-toe Shoes"
+          ]
+        },
+        {
+          id: "wed-3",
+          time: "03:30 PM - 06:30 PM",
+          start: "15:30",
+          end: "18:30",
+          title: "HNRS 2002: Survey of Health Professions",
+          room: "Health Sciences Campus",
+          buildingKey: "hsc"
         }
+      ],
 
-        function ymd(date) {
-            return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+      Thursday: [
+        {
+          id: "thu-1",
+          time: "11:00 AM - 12:15 PM",
+          start: "11:00",
+          end: "12:15",
+          title: "HNRS 2011: BLS Sem in Human",
+          room: "Brewster, 0D207",
+          buildingKey: "brewster"
+        },
+        {
+          id: "thu-2",
+          time: "12:30 PM - 01:45 PM",
+          start: "12:30",
+          end: "13:45",
+          title: "BIOL 1100: Principles of Biology I",
+          room: "Austin, 00205",
+          buildingKey: "austin"
         }
+      ],
 
-        function isNoClassDate(date) {
-            const day = date.getDay();
-            return day === 0 || day === 6 || noClassDates.has(ymd(date));
+      Friday: [
+        {
+          id: "fri-1",
+          time: "09:00 AM - 09:50 AM",
+          start: "09:00",
+          end: "09:50",
+          title: "CHEM 1150: General Chemistry I",
+          room: "Sci & Tech, 0C307",
+          buildingKey: "scitech"
         }
+      ]
+    };
 
-        function parseTime(timeStr, baseDate) {
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            const d = new Date(baseDate);
-            d.setHours(hours, minutes, 0, 0);
-            return d;
+    const defaultPackLists = {
+      Monday: [
+        "Laptop + charger",
+        "CHEM 1150 notes",
+        "BIOL 1101 lab notebook"
+      ],
+      Tuesday: [
+        "Laptop + charger",
+        "HLTH / HNRS readings",
+        "Evening: Rawl for HNRS 2000 at 5 PM"
+      ],
+      Wednesday: [
+        "Safety goggles",
+        "Lab coat",
+        "Long pants",
+        "Closed-toe shoes",
+        "Pirate ID",
+        "Route 302 plan for Health Sciences"
+      ],
+      Thursday: [
+        "Laptop + charger",
+        "HNRS 2011 + BIOL 1100 notes"
+      ],
+      Friday: [
+        "Laptop + CHEM 1150 notes",
+        "Light day — 9 AM only"
+      ]
+    };
+
+    const noClassDates = new Set([
+      "2026-09-07",
+      "2026-10-05",
+      "2026-10-06",
+      "2026-11-25",
+      "2026-11-26",
+      "2026-11-27"
+    ]);
+
+    const academicNotes = [
+      { date: "2026-09-07", title: "Labor Day — no classes" },
+      { date: "2026-10-05", title: "Fall Break (Mon–Tue)" },
+      { date: "2026-11-25", title: "Thanksgiving break starts" }
+    ];
+
+    const state = {
+      activeDay: "",
+      isUserSelected: false,
+      currentPrecipitation: 0,
+      hourlyForecast: [],
+      lastGps: null,
+      gpsDenied: false,
+      lastGpsAt: 0,
+      packLists: JSON.parse(JSON.stringify(defaultPackLists)),
+      notified: {},
+      storageOK: (() => {
+        try {
+          localStorage.setItem("cn-ping", "1");
+          localStorage.removeItem("cn-ping");
+          return true;
+        } catch {
+          return false;
         }
+      })()
+    };
 
-        function minutesBetween(endStr, startStr) {
-            const [eh, em] = endStr.split(':').map(Number);
-            const [sh, sm] = startStr.split(':').map(Number);
-            return (sh * 60 + sm) - (eh * 60 + em);
+    function save(key, value) {
+      if (!state.storageOK) return;
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {}
+    }
+
+    function load(key, fallback) {
+      if (!state.storageOK) return fallback;
+
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function initState() {
+      state.packLists = load("packLists", state.packLists);
+      state.notified = load("navNotified", {});
+      state.activeDay = todayScheduleName();
+    }
+
+    function ymd(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function noteForDate(date) {
+      return academicNotes.find(note => note.date === ymd(date))?.title || "";
+    }
+
+    function isNoClassDate(date) {
+      return [0, 6].includes(date.getDay()) || noClassDates.has(ymd(date));
+    }
+
+    function todayScheduleName() {
+      const name = DAY_NAMES[new Date().getDay()];
+      return schedule[name] ? name : "Monday";
+    }
+
+    function parseTime(timeStr, baseDate) {
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      const d = new Date(baseDate);
+      d.setHours(hours, minutes, 0, 0);
+      return d;
+    }
+
+    function formatClock(date) {
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function formatHMS(seconds) {
+      const d = Math.floor(seconds / 86400);
+      const h = Math.floor((seconds % 86400) / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = Math.floor(seconds % 60);
+
+      if (d > 0) return `${d}d ${h}h ${m}m`;
+      if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function courseKey(title) {
+      if (title.startsWith("CHEM")) return "chem";
+      if (title.startsWith("BIOL")) return "biol";
+      if (title.startsWith("HLTH")) return "hlth";
+      if (title.startsWith("HNRS")) return "hnrs";
+      return "other";
+    }
+
+    function haversineFeet(lat1, lon1, lat2, lon2) {
+      const R = 3958.8;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+
+      const miles = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return miles * 5280;
+    }
+
+    function nearestBuilding(lat, lon) {
+      let best = null;
+      let bestFeet = Infinity;
+
+      Object.entries(buildings).forEach(([key, building]) => {
+        const feet = haversineFeet(lat, lon, building.lat, building.lon);
+
+        if (feet < bestFeet) {
+          bestFeet = feet;
+          best = {
+            key,
+            feet,
+            ...building
+          };
         }
+      });
 
-        function formatHMS(seconds) {
-            const d = Math.floor(seconds / 86400);
-            const h = Math.floor((seconds % 86400) / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            const s = Math.floor(seconds % 60);
-            if (d > 0) return `${d}d ${h}h ${m}m`;
-            if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+      return best;
+    }
+
+    function walkPair(fromKey, toKey) {
+      if (!fromKey || !toKey || fromKey === toKey) return 2;
+
+      if (walkMatrix[fromKey]?.[toKey]) {
+        return walkMatrix[fromKey][toKey][0];
+      }
+
+      if (walkMatrix[toKey]?.[fromKey]) {
+        return walkMatrix[toKey][fromKey][0];
+      }
+
+      return 8;
+    }
+
+    function rainPenalty(toKey) {
+      return state.currentPrecipitation > 0
+        ? toKey === "hsc"
+          ? 5
+          : 3
+        : 0;
+    }
+
+    function walkMinutes(fromKey, toKey) {
+      return walkPair(fromKey, toKey) + rainPenalty(toKey);
+    }
+
+    function minutesBetween(endStr, startStr) {
+      const [endHours, endMinutes] = endStr.split(":").map(Number);
+      const [startHours, startMinutes] = startStr.split(":").map(Number);
+
+      return (startHours * 60 + startMinutes) - (endHours * 60 + endMinutes);
+    }
+
+    function originForClass(dayName, index) {
+      if (state.lastGps && Date.now() - state.lastGpsAt < 120000) {
+        const near = nearestBuilding(state.lastGps.lat, state.lastGps.lon);
+
+        if (near.feet < 500) return near.key;
+
+        if (
+          haversineFeet(
+            state.lastGps.lat,
+            state.lastGps.lon,
+            buildings.hsc.lat,
+            buildings.hsc.lon
+          ) < 1320
+        ) {
+          return "hsc";
         }
+      }
 
-        function formatClock(date) {
-            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        }
+      if (index <= 0) return "greene";
 
-        function haversineFeet(lat1, lon1, lat2, lon2) {
-            const R = 3958.8;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2) ** 2;
-            const miles = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return miles * 5280;
-        }
+      const previousClass = schedule[dayName][index - 1];
+      const gap = minutesBetween(
+        previousClass.end,
+        schedule[dayName][index].start
+      );
 
-        function nearestBuilding(lat, lon) {
-            let best = null;
-            let bestFeet = Infinity;
-            Object.entries(buildings).forEach(([key, b]) => {
-                const ft = haversineFeet(lat, lon, b.lat, b.lon);
-                if (ft < bestFeet) { bestFeet = ft; best = { key, feet: ft, ...b }; }
+      return gap <= 90 ? previousClass.buildingKey : "greene";
+    }
+
+    function alreadyThere(toKey) {
+      if (!state.lastGps || Date.now() - state.lastGpsAt > 120000) {
+        return false;
+      }
+
+      const building = buildings[toKey];
+
+      return (
+        haversineFeet(
+          state.lastGps.lat,
+          state.lastGps.lon,
+          building.lat,
+          building.lon
+        ) < 400
+      );
+    }
+
+    function mapLink(destinationKey, mode) {
+      const destination = buildings[destinationKey].maps;
+      let origin = buildings.greene.maps;
+
+      if (state.lastGps && Date.now() - state.lastGpsAt < 120000) {
+        origin = `${state.lastGps.lat},${state.lastGps.lon}`;
+      }
+
+      return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=${mode}`;
+    }
+
+    function weatherLabel(code, precipitation) {
+      if (
+        precipitation > 0 ||
+        (code >= 51 && code < 70) ||
+        (code >= 80 && code < 90)
+      ) {
+        return "Raining";
+      }
+
+      if (code >= 95) return "Storms";
+      if (code >= 71) return "Snow";
+      if (code >= 45) return "Fog";
+      if (code >= 2) return "Cloudy";
+
+      return "Clear";
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(showToast.timeout);
+
+      showToast.timeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    async function fetchWeather() {
+      try {
+        const response = await fetch(
+          "https://api.open-meteo.com/v1/forecast?latitude=35.6127&longitude=-77.3663&current=temperature_2m,precipitation,weather_code&hourly=temperature_2m,precipitation&timezone=America%2FNew_York"
+        );
+
+        const data = await response.json();
+        const temperatureF = Math.round((data.current.temperature_2m * 9 / 5) + 32);
+
+        state.currentPrecipitation = data.current.precipitation || 0;
+
+        document.getElementById("weatherWidget").innerHTML = `
+          <span>Greenville</span>
+          <strong>${temperatureF}°F · ${weatherLabel(
+            data.current.weather_code,
+            state.currentPrecipitation
+          )}</strong>
+        `;
+
+        state.hourlyForecast = [];
+
+        const now = new Date();
+
+        data.hourly.time.forEach((iso, index) => {
+          const time = new Date(iso);
+
+          if (time >= now && state.hourlyForecast.length < 5) {
+            state.hourlyForecast.push({
+              hour: time.toLocaleTimeString("en-US", { hour: "numeric" }),
+              temp: Math.round((data.hourly.temperature_2m[index] * 9 / 5) + 32),
+              precip: data.hourly.precipitation[index]
             });
-            return best;
-        }
-
-        function walkPair(fromKey, toKey) {
-            if (!fromKey || !toKey || fromKey === toKey) return { normal: 2, sprint: 1 };
-            if (walkMatrix[fromKey] && walkMatrix[fromKey][toKey]) {
-                const [n, s] = walkMatrix[fromKey][toKey];
-                return { normal: n, sprint: s };
-            }
-            if (walkMatrix[toKey] && walkMatrix[toKey][fromKey]) {
-                const [n, s] = walkMatrix[toKey][fromKey];
-                return { normal: n, sprint: s };
-            }
-            return { normal: 8, sprint: 4 };
-        }
-
-        function rainPenalty(toKey) {
-            return currentPrecipitation > 0 ? (toKey === 'hsc' ? 5 : 3) : 0;
-        }
-
-        function walkMinutes(fromKey, toKey) {
-            const pair = walkPair(fromKey, toKey);
-            const base = isSprintMode ? pair.sprint : pair.normal;
-            return base + rainPenalty(toKey);
-        }
-
-        function onMainCampus(lat, lon) {
-            return ['scitech', 'brewster', 'austin', 'rawl', 'greene'].some(k => {
-                const b = buildings[k];
-                return haversineFeet(lat, lon, b.lat, b.lon) < 2640;
-            });
-        }
-
-        function originForClass(dayName, index) {
-            if (lastGps && Date.now() - lastGpsAt < 120000) {
-                const near = nearestBuilding(lastGps.lat, lastGps.lon);
-                if (near.feet < 500) return near.key;
-                if (haversineFeet(lastGps.lat, lastGps.lon, buildings.hsc.lat, buildings.hsc.lon) < 1320) return 'hsc';
-            }
-            if (index <= 0) return 'greene';
-            const classes = schedule[dayName];
-            const prev = classes[index - 1];
-            const gap = minutesBetween(prev.end, classes[index].start);
-            if (gap <= 90) return prev.buildingKey;
-            if (lastGps && onMainCampus(lastGps.lat, lastGps.lon)) return nearestBuilding(lastGps.lat, lastGps.lon).key;
-            return 'greene';
-        }
-
-        function alreadyThere(toKey) {
-            if (!lastGps || Date.now() - lastGpsAt > 120000) return false;
-            const b = buildings[toKey];
-            return haversineFeet(lastGps.lat, lastGps.lon, b.lat, b.lon) < 400;
-        }
-
-        function mapLink(destKey, mode) {
-            const dest = buildings[destKey].maps;
-            let origin = buildings.greene.maps;
-            if (lastGps && Date.now() - lastGpsAt < 120000) origin = `${lastGps.lat},${lastGps.lon}`;
-            return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
-        }
-
-        function upcomingExams(title) {
-            const course = title.split(':')[0].trim();
-            const today = ymd(new Date());
-            return exams.filter(e => e.course === course && e.date >= today).sort((a,b) => a.date.localeCompare(b.date));
-        }
-
-        function daysUntil(dateStr) {
-            const t = new Date(dateStr + 'T00:00:00');
-            return Math.ceil((t - new Date().setHours(0,0,0,0)) / 86400000);
-        }
-
-        function showToast(msg) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3200);
-        }
-
-        function weatherLabel(code, precip) {
-            if (precip > 0 || (code >= 51 && code < 70) || (code >= 80 && code < 90)) return 'Raining';
-            if (code >= 95) return 'Storms';
-            if (code >= 71) return 'Snow';
-            if (code >= 45) return 'Fog';
-            if (code >= 2) return 'Cloudy';
-            return 'Clear';
-        }
-
-        async function fetchWeather() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6127&longitude=-77.3663&current=temperature_2m,precipitation,weather_code&hourly=temperature_2m,precipitation&timezone=America%2FNew_York');
-                const data = await res.json();
-                const tempF = Math.round((data.current.temperature_2m * 9/5) + 32);
-                currentPrecipitation = data.current.precipitation || 0;
-                const label = weatherLabel(data.current.weather_code, currentPrecipitation);
-                document.getElementById('weatherWidget').innerHTML = `<span>Greenville</span><strong>${tempF}°F · ${label}</strong>`;
-
-                hourlyForecast = [];
-                const now = new Date();
-                data.hourly.time.forEach((iso, i) => {
-                    const t = new Date(iso);
-                    if (t >= now && hourlyForecast.length < 5) {
-                        hourlyForecast.push({
-                            hour: t.toLocaleTimeString('en-US', { hour: 'numeric' }),
-                            temp: Math.round((data.hourly.temperature_2m[i] * 9/5) + 32),
-                            precip: data.hourly.precipitation[i]
-                        });
-                    }
-                });
-                document.getElementById('hourlyRow').innerHTML = hourlyForecast.map(h =>
-                    `<div class="hourly-chip">${h.hour}<strong>${h.temp}°</strong>${h.precip > 0 ? 'Rain' : 'Dry'}</div>`
-                ).join('');
-            } catch (e) {
-                document.getElementById('weatherWidget').innerHTML = `<span>Greenville</span><strong>Unavailable</strong>`;
-            }
-        }
-
-        function rainDuringWindow() {
-            if (currentPrecipitation > 0) return true;
-            return hourlyForecast.some(h => h.precip > 0);
-        }
-
-        function maybeTrackGPS() {
-            if (gpsDenied || !navigator.geolocation) return;
-            const now = Date.now();
-            if (now - lastGpsAt < 45000) return;
-            navigator.geolocation.getCurrentPosition(pos => {
-                lastGps = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-                lastGpsAt = Date.now();
-                const near = nearestBuilding(lastGps.lat, lastGps.lon);
-                const label = near.feet > 1000 ? `${(near.feet/5280).toFixed(1)} mi from ${near.label}` : `${Math.round(near.feet)} ft from ${near.label}`;
-                document.getElementById('gpsWidget').innerHTML = `<span>GPS</span><strong>${label}</strong>`;
-            }, () => {
-                gpsDenied = true;
-                document.getElementById('gpsWidget').innerHTML = `<span>GPS permission denied</span>`;
-            }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.getElementById('themeBtn').textContent = isDark ? 'Light' : 'Dark';
-        }
-
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.body.classList.add('dark-mode');
-            document.getElementById('themeBtn').textContent = 'Light';
-        }
-
-        function toggleSprintMode() {
-            isSprintMode = !isSprintMode;
-            localStorage.setItem('sprintMode', isSprintMode);
-            updateSprintUI();
-            if (activeDay) renderDay(activeDay);
-        }
-
-        function updateSprintUI() {
-            const btn = document.getElementById('sprintBtn');
-            if (isSprintMode) {
-                btn.classList.add('sprint-active');
-                btn.textContent = 'Sprint ON';
-            } else {
-                btn.classList.remove('sprint-active');
-                btn.textContent = 'Sprint';
-            }
-        }
-
-        function enableNotifications() {
-            if (!('Notification' in window)) { showToast('Notifications not supported'); return; }
-            Notification.requestPermission().then(permission => {
-                updateNotifyBtn();
-                if (permission === 'granted') showToast('Alerts on: 15-min, leave-now, and rain');
-            });
-        }
-
-        function updateNotifyBtn() {
-            const btn = document.getElementById('notifyBtn');
-            if (!('Notification' in window)) { btn.textContent = 'Alerts unavailable'; return; }
-            btn.textContent = Notification.permission === 'granted' ? 'Class alerts on' : 'Enable class alerts';
-        }
-
-        function fireNotice(key, title, body) {
-            if (notified[key]) return;
-            notified[key] = true;
-            localStorage.setItem('navNotified', JSON.stringify(notified));
-            showToast(`${title}: ${body}`);
-            if ('Notification' in window && Notification.permission === 'granted') {
-                try { new Notification(title, { body, tag: key }); } catch (e) {}
-            }
-        }
-
-        function checkAlerts(result, now) {
-            if (!result || result.type !== 'UPCOMING') return;
-            const dayKey = ymd(result.targetTime);
-            const secs = Math.max(0, Math.floor((result.targetTime - now) / 1000));
-            const walk = alreadyThere(result.cls.buildingKey) ? 2 : walkMinutes(result.fromKey, result.cls.buildingKey);
-            const leaveSecs = walk * 60;
-            const raining = currentPrecipitation > 0 || rainDuringWindow();
-
-            if (result.dayOffset === 0 && secs <= 900 && secs > leaveSecs) {
-                fireNotice(`${result.cls.id}-${dayKey}-15`, 'Class in 15 minutes', result.cls.title);
-            }
-            if (result.dayOffset === 0 && secs <= leaveSecs && secs > 0 && !alreadyThere(result.cls.buildingKey)) {
-                fireNotice(`${result.cls.id}-${dayKey}-leave`, 'Leave now', `${result.cls.title} · ${walk} min walk`);
-                const vk = `${result.cls.id}-${dayKey}`;
-                if (lastLeaveVibrateKey !== vk && navigator.vibrate) {
-                    navigator.vibrate([200, 80, 200]);
-                    lastLeaveVibrateKey = vk;
-                }
-            }
-            if (result.dayOffset === 0 && raining && secs <= 1800) {
-                fireNotice(`${result.cls.id}-${dayKey}-rain`, 'Rain on the walk', result.cls.title);
-            }
-        }
-
-        function getNextClassStatus(now) {
-            for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
-                const checkDate = new Date(now);
-                checkDate.setDate(now.getDate() + dayOffset);
-                if (isNoClassDate(checkDate)) continue;
-                const dayName = DAY_NAMES[checkDate.getDay()];
-                const dayClasses = schedule[dayName] || [];
-                for (let i = 0; i < dayClasses.length; i++) {
-                    const cls = dayClasses[i];
-                    const startTime = parseTime(cls.start, checkDate);
-                    const endTime = parseTime(cls.end, checkDate);
-                    const fromKey = originForClass(dayName, i);
-                    if (now >= startTime && now <= endTime && dayOffset === 0) {
-                        const next = dayClasses[i + 1] || null;
-                        return { type: 'IN_CLASS', cls, targetTime: endTime, startTime, dayName, index: i, fromKey, next };
-                    }
-                    if (now < startTime) {
-                        return { type: 'UPCOMING', cls, targetTime: startTime, dayOffset, dayName, index: i, fromKey };
-                    }
-                }
-            }
-            return null;
-        }
-
-        function updateTracker() {
-            const now = new Date();
-            const result = getNextClassStatus(now);
-            const tagElem = document.getElementById('statusTag');
-            const titleElem = document.getElementById('countdownTitle');
-            const timerElem = document.getElementById('countdownTimer');
-            const subtextElem = document.getElementById('countdownSubtext');
-            const banner = document.getElementById('statusBanner');
-            const progContainer = document.getElementById('progressContainer');
-            const progBar = document.getElementById('progressBar');
-            const leaveRow = document.getElementById('leaveRow');
-
-            const todayName = DAY_NAMES[now.getDay()];
-            const gpsRelevant = result && result.type === 'UPCOMING' && result.dayOffset === 0 && (result.targetTime - now) <= 20 * 60 * 1000;
-            if (gpsRelevant || (result && result.type === 'IN_CLASS')) maybeTrackGPS();
-
-            if (!result) {
-                activeClassId = null;
-                tagElem.textContent = 'Off Duty';
-                tagElem.className = 'status-tag';
-                titleElem.textContent = isNoClassDate(now) ? 'No classes today' : 'No schedule found';
-                timerElem.textContent = '--:--:--';
-                subtextElem.textContent = 'Enjoy the break';
-                progContainer.style.display = 'none';
-                leaveRow.style.display = 'none';
-                banner.classList.remove('sprint-alert', 'rain-alert', 'leave-now');
-            } else {
-                const secsRemaining = Math.max(0, Math.floor((result.targetTime - now) / 1000));
-                checkAlerts(result, now);
-
-                if (result.type === 'IN_CLASS') {
-                    activeClassId = result.cls.id;
-                    tagElem.textContent = 'In Class';
-                    tagElem.className = 'status-tag in-class';
-                    titleElem.textContent = result.cls.title;
-                    timerElem.textContent = formatHMS(secsRemaining);
-                    let sub = `Ends at ${result.cls.time.split('-')[1].trim()}`;
-                    if (result.next) {
-                        const w = walkMinutes(result.cls.buildingKey, result.next.buildingKey);
-                        sub += ` · then ${w} min to ${buildings[result.next.buildingKey].label}`;
-                    }
-                    subtextElem.textContent = sub;
-                    banner.classList.remove('sprint-alert', 'rain-alert', 'leave-now');
-                    leaveRow.style.display = 'none';
-                    const totalDuration = result.targetTime - result.startTime;
-                    const percentage = Math.min(100, Math.max(0, ((now - result.startTime) / totalDuration) * 100));
-                    progContainer.style.display = 'block';
-                    progBar.style.width = `${percentage}%`;
-                } else {
-                    activeClassId = null;
-                    const walk = alreadyThere(result.cls.buildingKey) ? 1 : walkMinutes(result.fromKey, result.cls.buildingKey);
-                    const leaveAt = new Date(result.targetTime.getTime() - walk * 60000);
-                    const shouldLeave = result.dayOffset === 0 && now >= leaveAt && now < result.targetTime && !alreadyThere(result.cls.buildingKey);
-                    const rainingWalk = currentPrecipitation > 0 && result.dayOffset === 0 && secsRemaining <= 1800;
-
-                    banner.classList.remove('sprint-alert', 'rain-alert', 'leave-now');
-                    if (shouldLeave) {
-                        banner.classList.add('leave-now');
-                        tagElem.textContent = 'Leave now';
-                    } else if (rainingWalk) {
-                        banner.classList.add('rain-alert');
-                        tagElem.textContent = 'Rain on the walk';
-                    } else if (result.dayOffset === 0 && secsRemaining <= 600) {
-                        banner.classList.add('sprint-alert');
-                        tagElem.textContent = 'Tight transition';
-                    } else {
-                        tagElem.textContent = result.dayOffset === 0 ? 'Up Next' : 'Next Class';
-                    }
-                    tagElem.className = 'status-tag';
-                    titleElem.textContent = result.cls.title;
-                    timerElem.textContent = formatHMS(secsRemaining);
-                    const startStr = result.cls.time.split('-')[0].trim();
-                    subtextElem.textContent = result.dayOffset === 0 ? `Starts at ${startStr}` : `Starts ${result.dayName} at ${startStr}`;
-                    progContainer.style.display = 'none';
-
-                    if (alreadyThere(result.cls.buildingKey)) {
-                        leaveRow.style.display = 'inline-flex';
-                        leaveRow.textContent = `You're at ${buildings[result.cls.buildingKey].label}`;
-                    } else if (result.dayOffset === 0) {
-                        leaveRow.style.display = 'inline-flex';
-                        const save = walkPair(result.fromKey, result.cls.buildingKey);
-                        const sprintHint = !isSprintMode && shouldLeave ? ` · Sprint saves ${save.normal - save.sprint} min` : '';
-                        leaveRow.textContent = `Leave ${buildings[result.fromKey].label} by ${formatClock(leaveAt)} · ${walk} min walk${sprintHint}`;
-                    } else {
-                        leaveRow.style.display = 'none';
-                    }
-                }
-            }
-
-            if (!isUserSelected) {
-                const defaultDay = (todayName === 'Saturday' || todayName === 'Sunday' || isNoClassDate(now)) ? 'Monday' : todayName;
-                if (activeDay !== defaultDay) renderDay(defaultDay);
-                else highlightActiveClass();
-            } else {
-                highlightActiveClass();
-            }
-            updateViewingChip(now);
-        }
-
-        function actualTodayName(now) {
-            const n = now || new Date();
-            const name = DAY_NAMES[n.getDay()];
-            if (name === 'Saturday' || name === 'Sunday' || isNoClassDate(n)) return 'Monday';
-            return name;
-        }
-
-        function updateViewingChip(now) {
-            const chip = document.getElementById('viewingChip');
-            const today = actualTodayName(now);
-            if (isUserSelected && activeDay !== today) {
-                chip.classList.add('show');
-                document.getElementById('viewingText').textContent = `Viewing ${activeDay} · today is ${DAY_NAMES[now.getDay()]}`;
-            } else chip.classList.remove('show');
-        }
-
-        function jumpToToday() {
-            isUserSelected = false;
-            renderDay(actualTodayName(new Date()));
-            updateViewingChip(new Date());
-        }
-
-        function highlightActiveClass() {
-            document.querySelectorAll('.class-card').forEach(card => {
-                if (card.dataset.id === activeClassId) {
-                    card.classList.add('is-active-class');
-                    if (!card.querySelector('.live-badge')) {
-                        const badge = document.createElement('span');
-                        badge.className = 'live-badge';
-                        badge.textContent = 'Now';
-                        card.querySelector('.card-header').appendChild(badge);
-                    }
-                } else {
-                    card.classList.remove('is-active-class');
-                    const badge = card.querySelector('.live-badge');
-                    if (badge) badge.remove();
-                }
-            });
-        }
-
-        function userSelectDay(day) {
-            isUserSelected = true;
-            renderDay(day);
-            updateViewingChip(new Date());
-        }
-
-        function bindChecks(root) {
-            root.querySelectorAll('input[type="checkbox"][data-store]').forEach(input => {
-                input.checked = localStorage.getItem(input.dataset.store) === '1';
-                input.addEventListener('change', () => localStorage.setItem(input.dataset.store, input.checked ? '1' : '0'));
-            });
-        }
-
-        function addPackItem(day) {
-            const input = document.getElementById('packAddInput');
-            const val = (input.value || '').trim();
-            if (!val) return;
-            packLists[day] = packLists[day] || [];
-            packLists[day].push(val);
-            savePackLists();
-            renderDay(day);
-        }
-
-        function removePackItem(day, index) {
-            packLists[day].splice(index, 1);
-            savePackLists();
-            renderDay(day);
-        }
-
-        function editPackItem(day, index, value) {
-            packLists[day][index] = value;
-            savePackLists();
-        }
-
-        function resetPackList(day) {
-            packLists[day] = [...defaultPackLists[day]];
-            savePackLists();
-            renderDay(day);
-        }
-
-        function renderWeekStrip() {
-            const todayName = DAY_NAMES[new Date().getDay()];
-            document.getElementById('weekStrip').innerHTML = ['Monday','Tuesday','Wednesday','Thursday','Friday'].map(day => {
-                const n = (schedule[day] || []).length;
-                const cls = [day === activeDay ? 'is-active' : '', day === todayName ? 'is-today' : ''].join(' ');
-                return `<button class="week-cell ${cls}" onclick="userSelectDay('${day}')"><small>${day.slice(0,3)}</small><strong>${n}</strong></button>`;
-            }).join('');
-            const soon = academicNotes.find(n => daysUntil(n.date) >= 0 && daysUntil(n.date) <= 10);
-            document.getElementById('weekHoliday').textContent = soon ? `Upcoming: ${soon.title} (${soon.date})` : '';
-            document.getElementById('calendarNote').textContent = soon ? soon.title : 'Fall 2026 · classes began Aug 17';
-        }
-
-        function escapeAttr(str) {
-            return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-        }
-
-        function renderDay(day) {
-            activeDay = day;
-            document.querySelectorAll('.day-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText.startsWith(day.substring(0,3)));
-            });
-            renderWeekStrip();
-
-            const container = document.getElementById('scheduleContainer');
-            container.innerHTML = '';
-            const classes = schedule[day] || [];
-            const now = new Date();
-            const viewingToday = DAY_NAMES[now.getDay()] === day;
-
-            if (isNoClassDate(now) && viewingToday) {
-                container.innerHTML = `<div class="empty-state"><h3>University holiday / weekend</h3><p>Next class day is queued in the banner.</p></div>`;
-                return;
-            }
-
-            if (classes.length === 0) {
-                container.innerHTML = `<div class="empty-state"><h3>No classes scheduled</h3><p>Enjoy your day off!</p></div>`;
-                return;
-            }
-
-            const pack = packLists[day] || [];
-            const packCard = document.createElement('article');
-            packCard.className = 'pack-card';
-            packCard.innerHTML = `
-                <div class="pack-head">
-                    <div class="card-kicker">Morning pack list</div>
-                    <button type="button" onclick="resetPackList('${day}')">Reset</button>
-                </div>
-                <div class="pack-items">
-                    ${pack.map((item, i) => `
-                        <label class="pack-item">
-                            <input type="checkbox" data-store="pack-${day}-${i}">
-                            <input type="text" value="${escapeAttr(item)}" onchange="editPackItem('${day}', ${i}, this.value)" aria-label="Pack item">
-                            <button type="button" class="del" onclick="removePackItem('${day}', ${i})" aria-label="Remove item">×</button>
-                        </label>
-                    `).join('')}
-                </div>
-                <form class="pack-add" onsubmit="event.preventDefault(); addPackItem('${day}');">
-                    <input id="packAddInput" type="text" placeholder="Add item..." autocomplete="off">
-                    <button type="submit">Add</button>
-                </form>
-            `;
-            container.appendChild(packCard);
-
-            classes.forEach((cls, i) => {
-                const fromKey = originForClass(day, i);
-                const walkMins = alreadyThere(cls.buildingKey) ? 1 : walkMinutes(fromKey, cls.buildingKey);
-                const gap = i === 0 ? null : minutesBetween(classes[i-1].end, cls.start);
-                const end = parseTime(cls.end, now);
-                const isPast = viewingToday && now > end;
-                const isActive = cls.id === activeClassId;
-                const nextExams = upcomingExams(cls.title);
-                const tightWalk = gap !== null && gap <= 20;
-                const map = mapLink(cls.buildingKey, 'walking');
-
-                const card = document.createElement('article');
-                card.className = `class-card course-${courseKey(cls.title)} ${isActive ? 'is-active-class' : ''} ${isPast ? 'is-past' : ''}`;
-                card.dataset.id = cls.id;
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div class="class-time">${cls.time}</div>
-                        <span class="walk-badge ${isSprintMode || tightWalk ? 'sprint-badge' : ''} ${tightWalk ? 'tight-badge' : ''}">
-                            ${alreadyThere(cls.buildingKey) ? 'On site' : `${isSprintMode ? 'Sprint' : 'Walk'} from ${buildings[fromKey].label}: ~${walkMins}m`}
-                        </span>
-                    </div>
-                    ${nextExams.length ? `<span class="exam-badge">${nextExams[0].title} in ${daysUntil(nextExams[0].date)}d (${nextExams[0].date})</span>` : ''}
-                    <h2 class="class-title">${cls.title}</h2>
-                    <div class="class-location">${cls.room}</div>
-                    ${cls.checklist ? `<div class="checklist-container">
-                        <div class="checklist-title">Lab gear checklist</div>
-                        <div class="checklist-items">${cls.checklist.map(item => `
-                            <label class="checklist-item"><input type="checkbox" data-store="check-${cls.id}-${item}"> ${item}</label>`).join('')}
-                        </div></div>` : ''}
-                    ${cls.buildingKey === 'hsc' ? `<div class="nav-row two">
-                        <a href="${map}" target="_blank" rel="noopener" class="nav-btn ${isSprintMode ? 'sprint-btn' : ''}">Walk</a>
-                        <a href="${mapLink('hsc','transit')}" target="_blank" rel="noopener" class="nav-btn ghost">Transit 302</a>
-                    </div>` : `<a href="${map}" target="_blank" rel="noopener" class="nav-btn ${isSprintMode ? 'sprint-btn' : ''}">${isSprintMode ? 'Sprint directions' : 'Get directions'}</a>`}
-                `;
-                if (isPast) {
-                    const done = document.createElement('span');
-                    done.className = 'done-badge';
-                    done.textContent = 'Done';
-                    card.querySelector('.card-header').appendChild(done);
-                }
-                container.appendChild(card);
-            });
-
-            bindChecks(container);
-        }
-
-        function icsDate(date, hhmm) {
-            const [h, m] = hhmm.split(':').map(Number);
-            const d = new Date(date);
-            d.setHours(h, m, 0, 0);
-            const p = n => String(n).padStart(2,'0');
-            return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
-        }
-
-        function exportICS() {
-            const start = new Date(TERM_START + 'T00:00:00');
-            let body = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//ECU Class Navigator//EN\r\nCALSCALE:GREGORIAN\r\n';
-            const byDay = { Monday: 'MO', Tuesday: 'TU', Wednesday: 'WE', Thursday: 'TH', Friday: 'FR' };
-            Object.entries(schedule).forEach(([day, classes]) => {
-                classes.forEach(cls => {
-                    const first = new Date(start);
-                    while (DAY_NAMES[first.getDay()] !== day) first.setDate(first.getDate() + 1);
-                    const ex = [...noClassDates].map(d => icsDate(new Date(d + 'T00:00:00'), cls.start)).join(',');
-                    body += `BEGIN:VEVENT\r\nUID:${cls.id}@classnav.ecu\r\nSUMMARY:${cls.title}\r\nLOCATION:${cls.room}\r\nDTSTART;TZID=America/New_York:${icsDate(first, cls.start)}\r\nDTEND;TZID=America/New_York:${icsDate(first, cls.end)}\r\nRRULE:FREQ=WEEKLY;BYDAY=${byDay[day]};UNTIL=${TERM_END}\r\n${ex ? 'EXDATE;TZID=America/New_York:' + ex + '\r\n' : ''}END:VEVENT\r\n`;
-                });
-            });
-            body += 'END:VCALENDAR\r\n';
-            const blob = new Blob([body], { type: 'text/calendar' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'ecu-class-navigator.ics';
-            a.click();
-            showToast('Calendar file downloaded');
-        }
-
-        function generateIcon() {
-            const c = document.createElement('canvas');
-            c.width = 192; c.height = 192;
-            const ctx = c.getContext('2d');
-            ctx.fillStyle = '#592A8A';
-            ctx.fillRect(0, 0, 192, 192);
-            ctx.beginPath(); ctx.arc(96, 96, 48, 0, Math.PI * 2); ctx.fillStyle = '#FDC82F'; ctx.fill();
-            ctx.fillStyle = '#3D1C60';
-            ctx.font = '800 52px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('CN', 96, 100);
-            return c.toDataURL('image/png');
-        }
-
-        function setupPWA() {
-            const icon = generateIcon();
-            let apple = document.querySelector('link[rel="apple-touch-icon"]');
-            if (!apple) {
-                apple = document.createElement('link');
-                apple.rel = 'apple-touch-icon';
-                document.head.appendChild(apple);
-            }
-            apple.href = icon;
-            const manifest = {
-                name: 'Class Navigator — ECU',
-                short_name: 'Class Nav',
-                start_url: '.',
-                display: 'standalone',
-                background_color: '#592A8A',
-                theme_color: '#592A8A',
-                icons: [{ src: icon, sizes: '192x192', type: 'image/png', purpose: 'any maskable' }]
-            };
-            document.getElementById('manifestLink').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' }));
-        }
-
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.finally(() => { deferredPrompt = null; });
-                return;
-            }
-            showToast('In your browser menu, choose Add to Home Screen');
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBtn').textContent = 'Install app';
+          }
         });
 
-        updateSprintUI();
-        updateNotifyBtn();
-        setupPWA();
-        fetchWeather();
-        setInterval(fetchWeather, 15 * 60 * 1000);
-        updateTracker();
-        setInterval(updateTracker, 1000);
-    </script>
+        document.getElementById("hourlyRow").innerHTML = state.hourlyForecast
+          .map(item => `
+            <div class="hourly-chip">
+              ${item.hour}
+              <strong>${item.temp}°</strong>
+              ${item.precip > 0 ? "Rain" : "Dry"}
+            </div>
+          `)
+          .join("");
+      } catch {
+        document.getElementById("weatherWidget").innerHTML = `
+          <span>Greenville</span>
+          <strong>Weather unavailable</strong>
+        `;
+      }
+    }
+
+    function maybeTrackGPS() {
+      if (state.gpsDenied || !navigator.geolocation) return;
+      if (Date.now() - state.lastGpsAt < 45000) return;
+
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          state.lastGps = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          };
+
+          state.lastGpsAt = Date.now();
+
+          const near = nearestBuilding(state.lastGps.lat, state.lastGps.lon);
+
+          const label =
+            near.feet > 1000
+              ? `${(near.feet / 5280).toFixed(1)} mi from ${near.label}`
+              : `${Math.round(near.feet)} ft from ${near.label}`;
+
+          document.getElementById("gpsWidget").innerHTML = `
+            <span>GPS</span>
+            <strong>${label}</strong>
+          `;
+        },
+        () => {
+          state.gpsDenied = true;
+          document.getElementById("gpsWidget").innerHTML = `
+            <span>GPS permission denied</span>
+          `;
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 30000
+        }
+      );
+    }
+
+    function renderWeekStrip() {
+      const strip = document.getElementById("weekStrip");
+      const today = new Date();
+      const weekday = today.getDay();
+      const monday = new Date(today);
+
+      monday.setDate(today.getDate() + (weekday === 0 ? -6 : 1 - weekday));
+
+      const days = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ];
+
+      strip.innerHTML = days
+        .map((name, index) => {
+          const date = new Date(monday);
+          date.setDate(monday.getDate() + index);
+
+          return `
+            <button
+              class="week-cell ${ymd(date) === ymd(today) ? "is-today" : ""} ${name === state.activeDay ? "is-active" : ""}"
+              data-day="${name}"
+            >
+              <small>${name.slice(0, 3)}</small>
+              <strong>${date.getDate()}</strong>
+            </button>
+          `;
+        })
+        .join("");
+
+      document.getElementById("weekHoliday").textContent = noteForDate(today);
+
+      strip.querySelectorAll("[data-day]").forEach(button => {
+        button.addEventListener("click", () => userSelectDay(button.dataset.day));
+      });
+    }
+
+    function renderViewingChip() {
+      const chip = document.getElementById("viewingChip");
+
+      if (state.activeDay !== todayScheduleName() || state.isUserSelected) {
+        chip.classList.add("show");
+        document.getElementById("viewingText").textContent = `Viewing ${state.activeDay}`;
+      } else {
+        chip.classList.remove("show");
+      }
+    }
+
+    function renderDaySelector() {
+      document.querySelectorAll(".day-btn").forEach(button => {
+        button.classList.toggle("active", button.dataset.day === state.activeDay);
+      });
+    }
+
+    function renderPackCard(dayName) {
+      const items = state.packLists[dayName] || [];
+
+      return `
+        <section class="pack-card">
+          <div class="card-kicker">Daily pack</div>
+
+          <div class="pack-head">
+            <strong>${dayName} essentials</strong>
+            <button type="button" data-reset-pack="${dayName}">Reset</button>
+          </div>
+
+          <div class="pack-items">
+            ${items
+              .map(
+                (item, index) => `
+                  <label class="pack-item">
+                    <input type="checkbox">
+
+                    <input
+                      type="text"
+                      value="${item.replace(/"/g, "&quot;")}"
+                      data-pack-day="${dayName}"
+                      data-pack-index="${index}"
+                    >
+
+                    <button
+                      type="button"
+                      class="del"
+                      data-del-pack="${dayName}"
+                      data-del-index="${index}"
+                      aria-label="Delete item"
+                    >
+                      ×
+                    </button>
+                  </label>
+                `
+              )
+              .join("")}
+          </div>
+
+          <div class="pack-add">
+            <input type="text" id="packAddInput" placeholder="Add another item">
+            <button type="button" class="nav-btn primary" id="packAddBtn">Add</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSchedule() {
+      const container = document.getElementById("scheduleContainer");
+      const entries = schedule[state.activeDay] || [];
+      const now = new Date();
+
+      if (!entries.length) {
+        container.innerHTML = `
+          <section class="empty-state">
+            <strong>No classes</strong>
+            Nothing scheduled for this day.
+          </section>
+        `;
+        return;
+      }
+
+      const cards = entries
+        .map((classItem, index) => {
+          const start = parseTime(classItem.start, now);
+          const end = parseTime(classItem.end, now);
+
+          const isToday = state.activeDay === DAY_NAMES[now.getDay()];
+          const isActive = isToday && now >= start && now <= end;
+          const isPast = isToday && now > end;
+
+          const fromKey = originForClass(state.activeDay, index);
+          const walk = alreadyThere(classItem.buildingKey)
+            ? 0
+            : walkMinutes(fromKey, classItem.buildingKey);
+
+          return `
+            <article class="class-card ${isActive ? "is-active-class" : ""} ${isPast ? "is-past" : ""} course-${courseKey(classItem.title)}">
+              <div class="card-header">
+                <span class="class-time">${classItem.time}</span>
+                <span class="walk-badge">${walk} min travel</span>
+              </div>
+
+              ${isActive ? `<div class="live-badge">In class</div>` : ""}
+
+              <div class="class-title">${classItem.title}</div>
+              <div class="class-location">${classItem.room}</div>
+
+              ${
+                classItem.checklist
+                  ? `
+                    <div class="checklist-container">
+                      <div class="checklist-title">Lab check</div>
+
+                      <div class="checklist-items">
+                        ${classItem.checklist
+                          .map(
+                            item => `
+                              <label class="checklist-item">
+                                <input type="checkbox">
+                                <span>${item}</span>
+                              </label>
+                            `
+                          )
+                          .join("")}
+                      </div>
+                    </div>
+                  `
+                  : ""
+              }
+
+              <div class="nav-row two">
+                <a
+                  class="nav-btn primary"
+                  href="${mapLink(classItem.buildingKey, "walking")}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open walking route
+                </a>
+
+                <a
+                  class="nav-btn"
+                  href="${mapLink(classItem.buildingKey, "driving")}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open driving route
+                </a>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      container.innerHTML = renderPackCard(state.activeDay) + cards;
+
+      bindPackEvents();
+    }
+
+    function bindPackEvents() {
+      document.querySelectorAll("[data-pack-day]").forEach(input => {
+        input.addEventListener("change", event => {
+          const day = event.target.dataset.packDay;
+          const index = Number(event.target.dataset.packIndex);
+
+          state.packLists[day][index] =
+            event.target.value.trim() || state.packLists[day][index];
+
+          save("packLists", state.packLists);
+        });
+      });
+
+      document.querySelectorAll("[data-del-pack]").forEach(button => {
+        button.addEventListener("click", () => {
+          const day = button.dataset.delPack;
+          const index = Number(button.dataset.delIndex);
+
+          state.packLists[day].splice(index, 1);
+
+          save("packLists", state.packLists);
+          renderSchedule();
+        });
+      });
+
+      document.querySelectorAll("[data-reset-pack]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.packLists[button.dataset.resetPack] = [
+            ...defaultPackLists[button.dataset.resetPack]
+          ];
+
+          save("packLists", state.packLists);
+          renderSchedule();
+          showToast("Pack list reset.");
+        });
+      });
+
+      const addButton = document.getElementById("packAddBtn");
+      const addInput = document.getElementById("packAddInput");
+
+      function addItem() {
+        const value = addInput.value.trim();
+
+        if (!value) return;
+
+        state.packLists[state.activeDay].push(value);
+
+        save("packLists", state.packLists);
+
+        addInput.value = "";
+        renderSchedule();
+      }
+
+      addButton?.addEventListener("click", addItem);
+
+      addInput?.addEventListener("keydown", event => {
+        if (event.key === "Enter") addItem();
+      });
+    }
+
+    function updateStatus() {
+      const tag = document.getElementById("statusTag");
+      const title = document.getElementById("countdownTitle");
+      const timer = document.getElementById("countdownTimer");
+      const subtext = document.getElementById("countdownSubtext");
+      const leaveRow = document.getElementById("leaveRow");
+      const progressContainer = document.getElementById("progressContainer");
+      const progressBar = document.getElementById("progressBar");
+
+      const now = new Date();
+      const todayName = DAY_NAMES[now.getDay()];
+      const todayClasses = schedule[todayName] || [];
+
+      tag.classList.remove("in-class");
+      leaveRow.style.display = "none";
+      progressContainer.style.display = "none";
+
+      if (isNoClassDate(now)) {
+        tag.textContent = "Day Off";
+        title.textContent = noteForDate(now) || "No classes today";
+        timer.textContent = "Relax";
+        subtext.textContent = "No campus moves needed right now.";
+        return;
+      }
+
+      for (let index = 0; index < todayClasses.length; index++) {
+        const classItem = todayClasses[index];
+        const start = parseTime(classItem.start, now);
+        const end = parseTime(classItem.end, now);
+
+        if (now >= start && now <= end) {
+          tag.textContent = "Live Now";
+          tag.classList.add("in-class");
+
+          title.textContent = classItem.title;
+          timer.textContent = formatHMS((end - now) / 1000);
+          subtext.textContent = `Ends at ${formatClock(end)} · ${classItem.room}`;
+
+          progressContainer.style.display = "block";
+          progressBar.style.width = `${((now - start) / (end - start)) * 100}%`;
+
+          return;
+        }
+
+        if (now < start) {
+          const fromKey = originForClass(todayName, index);
+
+          const travelTime = alreadyThere(classItem.buildingKey)
+            ? 0
+            : walkMinutes(fromKey, classItem.buildingKey);
+
+          const leaveAt = new Date(start.getTime() - travelTime * 60000);
+          const secondsUntil = Math.max(0, Math.floor((start - now) / 1000));
+
+          tag.textContent = travelTime <= 5 ? "Up Next" : "Transit";
+          title.textContent = classItem.title;
+          timer.textContent = formatHMS(secondsUntil);
+          subtext.textContent = `Starts at ${formatClock(start)} · ${classItem.room}`;
+
+          leaveRow.style.display = "inline-flex";
+          leaveRow.textContent = `Leave by ${formatClock(leaveAt)} · ${travelTime} min travel`;
+
+          maybeNotify(classItem, leaveAt);
+
+          return;
+        }
+      }
+
+      tag.textContent = "Done";
+      title.textContent = "Classes finished for today";
+      timer.textContent = "Free";
+      subtext.textContent = "You are clear for the rest of the day.";
+    }
+
+    function maybeNotify(classItem, leaveAt) {
+      if (!("Notification" in window)) return;
+      if (Notification.permission !== "granted") return;
+
+      const key = `${ymd(new Date())}:${classItem.id}`;
+      const now = Date.now();
+
+      if (state.notified[key]) return;
+
+      if (
+        now >= leaveAt.getTime() - 30000 &&
+        now <= leaveAt.getTime() + 120000
+      ) {
+        new Notification("Class Navigator", {
+          body: `Leave now for ${classItem.title} — ${classItem.room}`,
+          tag: key,
+          renotify: false
+        });
+
+        state.notified[key] = true;
+        save("navNotified", state.notified);
+      }
+    }
+
+    async function enableNotifications() {
+      if (!("Notification" in window)) {
+        showToast("Notifications are not supported in this browser.");
+        return;
+      }
+
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+      if (isIOS && !isStandalone) {
+        showToast(
+          "On iPhone, add this page to the Home Screen first, then open it from there to allow notifications."
+        );
+        return;
+      }
+
+      if (Notification.permission === "granted") {
+        document.getElementById("notifyBtn").textContent = "Reminders enabled";
+        showToast("Reminders are already enabled.");
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+
+      if (permission === "granted") {
+        document.getElementById("notifyBtn").textContent = "Reminders enabled";
+        showToast("Class reminders enabled.");
+      } else {
+        showToast("Notification permission was not granted.");
+      }
+    }
+
+    function exportICS() {
+      const lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Class Navigator//EN",
+        "CALSCALE:GREGORIAN"
+      ];
+
+      const dayCode = {
+        Monday: "MO",
+        Tuesday: "TU",
+        Wednesday: "WE",
+        Thursday: "TH",
+        Friday: "FR"
+      };
+
+      Object.entries(schedule).forEach(([day, entries]) => {
+        entries.forEach((classItem, index) => {
+          const firstDate = nextWeekdayDate(day);
+
+          const [startHour, startMinute] = classItem.start.split(":");
+          const [endHour, endMinute] = classItem.end.split(":");
+
+          const start = `${firstDate}T${startHour}${startMinute}00`;
+          const end = `${firstDate}T${endHour}${endMinute}00`;
+
+          lines.push("BEGIN:VEVENT");
+          lines.push(`UID:${day}-${index}@classnav`);
+          lines.push(`DTSTART:${start}`);
+          lines.push(`DTEND:${end}`);
+          lines.push(`RRULE:FREQ=WEEKLY;BYDAY=${dayCode[day]};UNTIL=${TERM_END}`);
+          lines.push(`SUMMARY:${classItem.title}`);
+          lines.push(`LOCATION:${classItem.room}`);
+          lines.push("END:VEVENT");
+        });
+      });
+
+      lines.push("END:VCALENDAR");
+
+      const blob = new Blob([lines.join("\r\n")], {
+        type: "text/calendar"
+      });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "class-navigator.ics";
+      link.click();
+
+      URL.revokeObjectURL(link.href);
+    }
+
+    function nextWeekdayDate(dayName) {
+      const targetDay = DAY_NAMES.indexOf(dayName);
+      const base = new Date(`${TERM_START}T09:00:00`);
+
+      const difference = (targetDay - base.getDay() + 7) % 7;
+
+      base.setDate(base.getDate() + difference);
+
+      return `${base.getFullYear()}${String(base.getMonth() + 1).padStart(2, "0")}${String(base.getDate()).padStart(2, "0")}`;
+    }
+
+    function userSelectDay(day) {
+      state.activeDay = day;
+      state.isUserSelected = true;
+      refreshUI();
+    }
+
+    function jumpToToday() {
+      state.activeDay = todayScheduleName();
+      state.isUserSelected = false;
+      refreshUI();
+    }
+
+    function refreshUI() {
+      renderWeekStrip();
+      renderViewingChip();
+      renderDaySelector();
+      renderSchedule();
+
+      document.getElementById("calendarNote").textContent =
+        noteForDate(new Date()) || "";
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      const isHighContrast = root.dataset.contrast === "high";
+
+      if (isHighContrast) {
+        root.dataset.contrast = "normal";
+        root.style.setProperty("--panel", "rgba(20, 24, 33, 0.72)");
+        root.style.setProperty("--purple", "#7d63ff");
+        showToast("Higher-contrast mode off.");
+      } else {
+        root.dataset.contrast = "high";
+        root.style.setProperty("--panel", "rgba(23, 28, 40, 0.82)");
+        root.style.setProperty("--purple", "#8f7cff");
+        showToast("Higher-contrast mode on.");
+      }
+    }
+
+    function bindControls() {
+      document.querySelectorAll(".day-btn").forEach(button => {
+        button.addEventListener("click", () => {
+          userSelectDay(button.dataset.day);
+        });
+      });
+
+      document.getElementById("jumpTodayBtn").addEventListener("click", jumpToToday);
+      document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+      document.getElementById("notifyBtn").addEventListener("click", enableNotifications);
+      document.getElementById("calendarBtn").addEventListener("click", exportICS);
+    }
+
+    initState();
+    bindControls();
+    refreshUI();
+    fetchWeather();
+    maybeTrackGPS();
+    updateStatus();
+
+    setInterval(updateStatus, 1000);
+    setInterval(maybeTrackGPS, 60000);
+    setInterval(fetchWeather, 15 * 60 * 1000);
+  </script>
 </body>
 </html>
