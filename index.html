@@ -2,22 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#592A8A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Class Nav">
     <title>Class Navigator - ECU</title>
+    <link rel="manifest" id="manifestLink">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- PWA Web App Manifest via Data URI -->
-    <link rel="manifest" href='data:application/manifest+json,{
-        "name": "ECU Class Navigator",
-        "short_name": "Navigator",
-        "start_url": "./",
-        "display": "standalone",
-        "background_color": "#F8FAFC",
-        "theme_color": "#592A8A",
-        "icons": [{"src": "https://via.placeholder.com/192.png", "sizes": "192x192", "type": "image/png"}]
-    }'>
 
     <style>
         :root {
@@ -41,6 +35,10 @@
             --alert-text: #B91C1C;
             --sprint-amber: #D97706;
             --sprint-amber-bg: rgba(217, 119, 6, 0.12);
+            --chem: #7C3AED;
+            --biol: #0D9488;
+            --hlth: #2563EB;
+            --hnrs: #D97706;
         }
 
         body.dark-mode {
@@ -56,20 +54,20 @@
             --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background-color: var(--bg-canvas); 
-            color: var(--text-primary); 
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
             min-height: 100vh;
             padding: 24px 16px 40px;
             -webkit-font-smoothing: antialiased;
             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
         }
 
         .layout-wrapper {
@@ -87,29 +85,18 @@
                 align-items: flex-start;
                 padding-top: 40px;
             }
-            .app-container {
-                flex: 1;
-                min-width: 500px;
-            }
-            .sidebar {
-                width: 340px;
-                position: sticky;
-                top: 40px;
-            }
+            .app-container { flex: 1; min-width: 500px; }
+            .sidebar { width: 340px; position: sticky; top: 40px; }
         }
 
         header {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
 
         .toggle-btn {
             background: var(--surface);
@@ -124,7 +111,7 @@
             align-items: center;
             gap: 6px;
             box-shadow: var(--shadow-subtle);
-            transition: all 0.2s ease;
+            font-family: inherit;
         }
 
         .toggle-btn.sprint-active {
@@ -157,29 +144,83 @@
             background-color: var(--ecu-gold);
         }
 
-        h1 { 
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: -0.03em;
+        h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+
+        .week-strip {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
-        /* Banner */
+        .week-cell {
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            font-family: inherit;
+            color: var(--text-secondary);
+        }
+
+        .week-cell strong { display: block; font-size: 1rem; color: var(--text-primary); font-weight: 800; }
+        .week-cell small { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        .week-cell.is-today { border-color: var(--ecu-purple); }
+        .week-cell.is-active { background: var(--ecu-purple); color: #fff; }
+        .week-cell.is-active strong { color: #fff; }
+
+        .viewing-chip {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: var(--ecu-purple-light);
+            color: var(--ecu-purple);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 0.8125rem;
+            font-weight: 700;
+        }
+
+        .viewing-chip.show { display: flex; }
+        body.dark-mode .viewing-chip { color: #C084FC; }
+
+        .viewing-chip button {
+            border: none;
+            background: var(--ecu-purple);
+            color: #fff;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
         .status-banner {
             background: linear-gradient(135deg, var(--ecu-purple) 0%, var(--ecu-purple-dark) 100%);
             color: white;
             border-radius: var(--radius-card);
             padding: 22px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow-active);
-            position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
         }
 
-        .status-banner.sprint-alert, .status-banner.rain-alert {
+        .status-banner.sprint-alert,
+        .status-banner.rain-alert,
+        .status-banner.leave-now {
             background: linear-gradient(135deg, #7C2D12 0%, #451A03 100%);
             border: 2px solid var(--ecu-gold);
+        }
+
+        .status-banner.leave-now { animation: leavePulse 1.6s ease-in-out infinite; }
+
+        @keyframes leavePulse {
+            0%, 100% { box-shadow: 0 8px 20px rgba(89, 42, 138, 0.2); }
+            50% { box-shadow: 0 0 0 6px rgba(253, 200, 47, 0.25); }
         }
 
         .status-header {
@@ -187,6 +228,7 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 8px;
+            gap: 8px;
         }
 
         .status-tag {
@@ -197,7 +239,6 @@
             padding: 4px 10px;
             border-radius: 20px;
             background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(4px);
         }
 
         .status-tag.in-class {
@@ -231,6 +272,16 @@
             font-weight: 500;
         }
 
+        .leave-row {
+            margin-top: 10px;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            background: rgba(255,255,255,0.12);
+            display: inline-flex;
+            padding: 6px 10px;
+            border-radius: 999px;
+        }
+
         .progress-container {
             margin-top: 16px;
             background: rgba(255, 255, 255, 0.2);
@@ -240,14 +291,8 @@
             display: none;
         }
 
-        .progress-bar {
-            height: 100%;
-            background: var(--live-green);
-            width: 0%;
-            transition: width 1s linear;
-        }
+        .progress-bar { height: 100%; background: var(--live-green); width: 0%; transition: width 1s linear; }
 
-        /* Sidebar Utilities */
         .utility-card {
             background: var(--surface);
             border-radius: var(--radius-card);
@@ -264,40 +309,24 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .utility-link {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: var(--bg-canvas);
-            border-radius: var(--radius-btn);
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.875rem;
-            margin-bottom: 8px;
         }
 
         .utility-btn {
-            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 12px;
             background: var(--ecu-purple-light);
-            color: var(--ecu-purple);
-            border: none;
             border-radius: var(--radius-btn);
+            color: var(--ecu-purple);
             font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 8px;
-            font-family: inherit;
             font-size: 0.875rem;
-            transition: opacity 0.2s;
+            margin-bottom: 8px;
+            border: none;
+            width: 100%;
+            font-family: inherit;
+            cursor: pointer;
         }
-        .utility-btn:hover { opacity: 0.85; }
 
         body.dark-mode .utility-btn { color: #C084FC; }
 
@@ -313,49 +342,103 @@
             margin-bottom: 8px;
         }
 
-        /* Day Selector */
-        .day-selector { 
-            display: grid; 
+        .hourly-row {
+            display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 6px; 
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .hourly-chip {
+            background: var(--bg-canvas);
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .hourly-chip strong { display: block; color: var(--text-primary); font-size: 0.75rem; }
+
+        .day-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
             background: var(--surface);
             padding: 4px;
             border-radius: 14px;
-            margin-bottom: 20px; 
+            margin-bottom: 16px;
             border: 1px solid var(--border-subtle);
         }
 
-        .day-btn { 
-            border: none; 
+        .day-btn {
+            border: none;
             padding: 10px 0;
-            border-radius: 10px; 
-            background: transparent; 
-            color: var(--text-secondary); 
-            font-weight: 700; 
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 700;
             font-size: 0.875rem;
-            cursor: pointer; 
-            transition: all 0.2s ease;
+            cursor: pointer;
+            font-family: inherit;
         }
 
-        .day-btn.active { 
-            background-color: var(--ecu-purple); 
-            color: white; 
+        .day-btn.active {
+            background-color: var(--ecu-purple);
+            color: white;
             box-shadow: 0 2px 8px rgba(89, 42, 138, 0.3);
         }
 
-        /* Class Cards */
-        .class-card { 
-            background: var(--surface); 
-            border-radius: var(--radius-card); 
-            padding: 20px; 
-            margin-bottom: 14px; 
+        .class-card, .pack-card {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            padding: 20px;
+            margin-bottom: 14px;
             box-shadow: var(--shadow-subtle);
             border: 1px solid var(--border-subtle);
         }
 
+        .class-card { border-left: 4px solid var(--ecu-purple); }
+        .class-card.course-chem { border-left-color: var(--chem); }
+        .class-card.course-biol { border-left-color: var(--biol); }
+        .class-card.course-hlth { border-left-color: var(--hlth); }
+        .class-card.course-hnrs { border-left-color: var(--hnrs); }
         .class-card.is-active-class {
             border: 2px solid var(--ecu-purple);
+            border-left-width: 4px;
             box-shadow: 0 4px 16px rgba(89, 42, 138, 0.12);
+        }
+        .class-card.is-past { opacity: 0.55; }
+
+        .pack-card { background: var(--ecu-purple-light); }
+
+        .card-kicker {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+        }
+
+        .pack-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .pack-head button {
+            border: none;
+            background: var(--surface);
+            color: var(--text-secondary);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .card-header {
@@ -363,12 +446,13 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            gap: 8px;
         }
 
-        .class-time { 
-            font-size: 0.8125rem; 
-            color: var(--text-secondary); 
-            font-weight: 700; 
+        .class-time {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -377,7 +461,7 @@
             border-radius: 6px;
         }
 
-        .walk-badge {
+        .walk-badge, .exam-badge, .done-badge {
             font-size: 0.7rem;
             font-weight: 800;
             padding: 3px 8px;
@@ -385,12 +469,21 @@
             background: var(--bg-canvas);
             color: var(--text-secondary);
             border: 1px solid var(--border-subtle);
+            white-space: nowrap;
         }
 
-        .walk-badge.sprint-badge {
+        .walk-badge.sprint-badge, .walk-badge.tight-badge {
             background: var(--sprint-amber-bg);
             color: var(--sprint-amber);
             border-color: rgba(217, 119, 6, 0.3);
+        }
+
+        .exam-badge {
+            background: var(--alert-bg);
+            color: var(--alert-text);
+            border-color: transparent;
+            margin-bottom: 8px;
+            display: inline-flex;
         }
 
         .live-badge {
@@ -421,18 +514,17 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .class-title { 
-            font-size: 1.0625rem; 
+        .class-title {
+            font-size: 1.0625rem;
             font-weight: 700;
-            color: var(--text-primary);
             line-height: 1.35;
             margin-bottom: 10px;
         }
 
-        .class-location { 
-            font-size: 0.875rem; 
+        .class-location {
+            font-size: 0.875rem;
             color: var(--text-secondary);
-            margin-bottom: 12px; 
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -453,52 +545,93 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        .checklist-items {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
+        .checklist-items { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-        .checklist-item {
+        .checklist-item, .pack-item {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 0.8125rem;
             font-weight: 600;
-            cursor: pointer;
         }
 
-        .checklist-item input {
+        .pack-items { display: grid; gap: 8px; }
+
+        .pack-item input[type="checkbox"], .checklist-item input {
             accent-color: var(--ecu-purple);
             width: 16px;
             height: 16px;
+            flex-shrink: 0;
         }
 
-        .nav-btn { 
-            display: inline-flex; 
+        .pack-item input[type="text"] {
+            flex: 1;
+            border: 1px solid var(--border-subtle);
+            background: var(--surface);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .pack-item .del {
+            border: none;
+            background: transparent;
+            color: var(--alert-text);
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 4px;
+        }
+
+        .pack-add {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pack-add input {
+            flex: 1;
+            border: 1px solid var(--border-subtle);
+            background: var(--surface);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .pack-add button, .nav-btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            width: 100%; 
-            padding: 12px 16px; 
-            background-color: var(--ecu-purple); 
-            color: white; 
-            text-decoration: none; 
-            border-radius: var(--radius-btn); 
-            font-weight: 700; 
+            padding: 10px 14px;
+            background-color: var(--ecu-purple);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-btn);
+            font-weight: 700;
             font-size: 0.875rem;
-            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
 
-        .nav-btn.sprint-btn {
-            background-color: var(--sprint-amber);
+        .nav-btn { width: 100%; padding: 12px 16px; }
+        .nav-btn.sprint-btn { background-color: var(--sprint-amber); }
+        .nav-btn.ghost {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
         }
-
+        .nav-row { display: grid; gap: 8px; }
+        .nav-row.two { grid-template-columns: 1fr 1fr; }
         .nav-btn:active { transform: scale(0.98); }
 
         .empty-state {
@@ -509,50 +642,47 @@
             border: 1px dashed var(--border-subtle);
             color: var(--text-secondary);
         }
+
+        .holiday-note {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(120%);
+            background: #111827;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            z-index: 50;
+            transition: transform 0.25s ease;
+            max-width: 90vw;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
-
     <div class="layout-wrapper">
         <aside class="sidebar">
-            <!-- Weather & GPS Utilities -->
             <div class="utility-card">
-                <div class="utility-header">
-                    <span>⛅ Live Conditions</span>
+                <div class="utility-header">Live Conditions</div>
+                <div class="weather-info" id="weatherWidget"><span>Loading weather...</span></div>
+                <div class="weather-info" id="gpsWidget" style="font-size:0.75rem;color:var(--text-secondary);">
+                    <span>GPS Distance: Not tracked</span>
                 </div>
-                <div class="weather-info" id="weatherWidget">
-                    <span>Loading weather...</span>
-                </div>
-                <div class="weather-info" id="gpsWidget" style="font-size:0.75rem; color:var(--text-secondary);">
-                    <span>📍 GPS Distance: Not tracked</span>
-                </div>
-            </div>
-
-            <!-- Calendar & Data Portability -->
-            <div class="utility-card">
-                <div class="utility-header">
-                    <span>⚙️ Data & Sync</span>
-                </div>
-                <button class="utility-btn" onclick="exportICS()">📅 Export .ics Calendar</button>
-                <button class="utility-btn" onclick="exportJSONBackup()">💾 Backup Settings (JSON)</button>
-                <button class="utility-btn" onclick="document.getElementById('importFile').click()">📂 Restore JSON</button>
-                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importJSONBackup(event)">
-            </div>
-
-            <!-- Campus Links -->
-            <div class="utility-card">
-                <div class="utility-header">
-                    <span>📍 Campus Utilities</span>
-                </div>
-                <a href="https://transit.ecu.edu/" target="_blank" class="utility-link">
-                    ECU Bus Tracker
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                </a>
-                <a href="https://weather.com/weather/today/l/Greenville+NC" target="_blank" class="utility-link">
-                    Greenville Weather
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                </a>
-                <button class="utility-btn" onclick="enableNotifications()">Enable Push Alerts</button>
+                <div class="hourly-row" id="hourlyRow"></div>
+                <div class="holiday-note" id="calendarNote"></div>
+                <button class="utility-btn" onclick="enableNotifications()" id="notifyBtn">Enable class alerts</button>
+                <button class="utility-btn" onclick="exportICS()">Export schedule (.ics)</button>
+                <button class="utility-btn" onclick="installPWA()" id="installBtn">Add to Home Screen</button>
             </div>
         </aside>
 
@@ -560,15 +690,19 @@
             <header>
                 <h1>Class Navigator</h1>
                 <div class="header-actions">
-                    <button class="toggle-btn" onclick="toggleSprintMode()" id="sprintBtn">
-                        ⚡ Sprint
-                    </button>
-                    <button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">
-                        🌙 Dark
-                    </button>
+                    <button class="toggle-btn" onclick="toggleSprintMode()" id="sprintBtn">Sprint</button>
+                    <button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">Dark</button>
                     <div class="brand-badge">ECU</div>
                 </div>
             </header>
+
+            <div class="week-strip" id="weekStrip"></div>
+            <div class="holiday-note" id="weekHoliday"></div>
+
+            <div class="viewing-chip" id="viewingChip">
+                <span id="viewingText">Viewing another day</span>
+                <button type="button" onclick="jumpToToday()">Jump to today</button>
+            </div>
 
             <div class="status-banner" id="statusBanner">
                 <div class="status-header">
@@ -577,12 +711,12 @@
                 <div class="countdown-title" id="countdownTitle">Loading schedule...</div>
                 <div class="countdown-timer" id="countdownTimer">--:--:--</div>
                 <div class="countdown-subtext" id="countdownSubtext">Calculating time remaining</div>
-                
+                <div class="leave-row" id="leaveRow" style="display:none;"></div>
                 <div class="progress-container" id="progressContainer">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
             </div>
-            
+
             <nav class="day-selector" id="daySelector">
                 <button class="day-btn" onclick="userSelectDay('Monday')">Mon</button>
                 <button class="day-btn" onclick="userSelectDay('Tuesday')">Tue</button>
@@ -594,130 +728,328 @@
             <main id="scheduleContainer" aria-live="polite"></main>
         </div>
     </div>
+    <div class="toast" id="toast"></div>
 
     <script>
-        const origin = "Greene Hall, East Carolina University";
-        const originCoords = { lat: 35.6074, lon: -77.3661 };
+        const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const TERM_END = '20261211T235959';
+        const TERM_START = '2026-08-17';
 
-        // Building Lat/Long approximate coordinates for live GPS distance calculation
-        const buildingCoords = {
-            "Science and Technology Building, East Carolina University": { lat: 35.6085, lon: -77.3650 },
-            "Brewster Building, East Carolina University": { lat: 35.6092, lon: -77.3705 },
-            "Austin Building, East Carolina University": { lat: 35.6078, lon: -77.3680 },
-            "Rawl Building, East Carolina University": { lat: 35.6080, lon: -77.3695 },
-            "Health Sciences Campus, East Carolina University": { lat: 35.5870, lon: -77.3820 }
+        const buildings = {
+            greene: { label: 'Greene Hall', maps: 'Greene Hall, East Carolina University', lat: 35.6056, lon: -77.3668 },
+            scitech: { label: 'Sci & Tech', maps: 'Science and Technology Building, East Carolina University', lat: 35.6085, lon: -77.3650 },
+            brewster: { label: 'Brewster', maps: 'Brewster Building, East Carolina University', lat: 35.6092, lon: -77.3705 },
+            austin: { label: 'Austin', maps: 'Austin Building, East Carolina University', lat: 35.6078, lon: -77.3680 },
+            rawl: { label: 'Rawl', maps: 'Rawl Building, East Carolina University', lat: 35.6080, lon: -77.3695 },
+            hsc: { label: 'Health Sciences', maps: 'Health Sciences Campus, East Carolina University', lat: 35.5870, lon: -77.3820 }
         };
-        
-        const walkTimes = {
-            "Science and Technology Building, East Carolina University": { normal: 8, sprint: 4 },
-            "Brewster Building, East Carolina University": { normal: 6, sprint: 3 },
-            "Austin Building, East Carolina University": { normal: 5, sprint: 2 },
-            "Rawl Building, East Carolina University": { normal: 7, sprint: 3 },
-            "Health Sciences Campus, East Carolina University": { normal: 25, sprint: 12 }
+
+        const walkMatrix = {
+            greene: { scitech: [8,4], brewster: [6,3], austin: [5,2], rawl: [7,3], hsc: [25,12] },
+            scitech: { brewster: [6,3], austin: [5,3], rawl: [6,3], hsc: [25,12] },
+            brewster: { austin: [4,2], rawl: [4,2], hsc: [24,12] },
+            austin: { rawl: [5,2], hsc: [24,12] },
+            rawl: { hsc: [23,12] }
         };
 
         const schedule = {
             Monday: [
-                { id: "mon-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" },
-                { id: "mon-2", time: "02:00 PM - 04:50 PM", start: "14:00", end: "16:50", title: "BIOL 1101: Principles of Biology Lab I", room: "Sci & Tech, 00339", building: "Science and Technology Building, East Carolina University" }
+                { id: 'mon-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'CHEM 1150: General Chemistry I', room: 'Sci & Tech, 0C307', buildingKey: 'scitech' },
+                { id: 'mon-2', time: '02:00 PM - 04:50 PM', start: '14:00', end: '16:50', title: 'BIOL 1101: Principles of Biology Lab I', room: 'Sci & Tech, 00339', buildingKey: 'scitech' }
             ],
             Tuesday: [
-                { id: "tue-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "HLTH 1000: Health in Modern Society", room: "Brewster, 0C302", building: "Brewster Building, East Carolina University" },
-                { id: "tue-2", time: "11:00 AM - 12:15 PM", start: "11:00", end: "12:15", title: "HNRS 2011: BLS Sem in Human", room: "Brewster, 0D207", building: "Brewster Building, East Carolina University" },
-                { id: "tue-3", time: "12:30 PM - 01:45 PM", start: "12:30", end: "13:45", title: "BIOL 1100: Principles of Biology I", room: "Austin, 00205", building: "Austin Building, East Carolina University" },
-                { id: "tue-4", time: "05:00 PM - 07:00 PM", start: "17:00", end: "19:00", title: "HNRS 2000: Honors Leadership & Service Colloquium", room: "Rawl, 00205", building: "Rawl Building, East Carolina University" }
+                { id: 'tue-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'HLTH 1000: Health in Modern Society', room: 'Brewster, 0C302', buildingKey: 'brewster' },
+                { id: 'tue-2', time: '11:00 AM - 12:15 PM', start: '11:00', end: '12:15', title: 'HNRS 2011: BLS Sem in Human', room: 'Brewster, 0D207', buildingKey: 'brewster' },
+                { id: 'tue-3', time: '12:30 PM - 01:45 PM', start: '12:30', end: '13:45', title: 'BIOL 1100: Principles of Biology I', room: 'Austin, 00205', buildingKey: 'austin' },
+                { id: 'tue-4', time: '05:00 PM - 07:00 PM', start: '17:00', end: '19:00', title: 'HNRS 2000: Honors Leadership & Service Colloquium', room: 'Rawl, 00205', buildingKey: 'rawl' }
             ],
             Wednesday: [
-                { id: "wed-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" },
-                { id: "wed-2", time: "11:00 AM - 01:50 PM", start: "11:00", end: "13:50", title: "CHEM 1151: General Chemistry Lab I", room: "Sci & Tech, 00432", building: "Science and Technology Building, East Carolina University", checklist: ["Safety Goggles", "Lab Coat", "Long Pants", "Closed-toe Shoes"] },
-                { id: "wed-3", time: "03:30 PM - 06:30 PM", start: "15:30", end: "18:30", title: "HNRS 2002: Survey of Health Professions", room: "Health Sciences Campus", building: "Health Sciences Campus, East Carolina University" }
+                { id: 'wed-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'CHEM 1150: General Chemistry I', room: 'Sci & Tech, 0C307', buildingKey: 'scitech' },
+                { id: 'wed-2', time: '11:00 AM - 01:50 PM', start: '11:00', end: '13:50', title: 'CHEM 1151: General Chemistry Lab I', room: 'Sci & Tech, 00432', buildingKey: 'scitech', checklist: ['Safety Goggles', 'Lab Coat', 'Long Pants', 'Closed-toe Shoes'] },
+                { id: 'wed-3', time: '03:30 PM - 06:30 PM', start: '15:30', end: '18:30', title: 'HNRS 2002: Survey of Health Professions', room: 'Health Sciences Campus', buildingKey: 'hsc' }
             ],
             Thursday: [
-                { id: "thu-1", time: "11:00 AM - 12:15 PM", start: "11:00", end: "12:15", title: "HNRS 2011: BLS Sem in Human", room: "Brewster, 0D207", building: "Brewster Building, East Carolina University" },
-                { id: "thu-2", time: "12:30 PM - 01:45 PM", start: "12:30", end: "13:45", title: "BIOL 1100: Principles of Biology I", room: "Austin, 00205", building: "Austin Building, East Carolina University" }
+                { id: 'thu-1', time: '11:00 AM - 12:15 PM', start: '11:00', end: '12:15', title: 'HNRS 2011: BLS Sem in Human', room: 'Brewster, 0D207', buildingKey: 'brewster' },
+                { id: 'thu-2', time: '12:30 PM - 01:45 PM', start: '12:30', end: '13:45', title: 'BIOL 1100: Principles of Biology I', room: 'Austin, 00205', buildingKey: 'austin' }
             ],
             Friday: [
-                { id: "fri-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" }
+                { id: 'fri-1', time: '09:00 AM - 09:50 AM', start: '09:00', end: '09:50', title: 'CHEM 1150: General Chemistry I', room: 'Sci & Tech, 0C307', buildingKey: 'scitech' }
             ]
         };
 
-        let activeDay = "";
+        const defaultPackLists = {
+            Monday: ['Laptop + charger', 'CHEM 1150 notes', 'BIOL 1101 lab notebook'],
+            Tuesday: ['Laptop + charger', 'HLTH / HNRS readings', 'Evening: Rawl for HNRS 2000 at 5 PM'],
+            Wednesday: ['Safety goggles', 'Lab coat', 'Long pants', 'Closed-toe shoes', 'Pirate ID', 'Route 302 plan for Health Sciences'],
+            Thursday: ['Laptop + charger', 'HNRS 2011 + BIOL 1100 notes'],
+            Friday: ['Laptop + CHEM 1150 notes', 'Light day — 9 AM only']
+        };
+
+        const exams = [];
+
+        const noClassDates = new Set([
+            '2026-09-07',
+            '2026-10-05', '2026-10-06',
+            '2026-11-25', '2026-11-26', '2026-11-27'
+        ]);
+
+        const academicNotes = [
+            { date: '2026-09-07', title: 'Labor Day — no classes' },
+            { date: '2026-10-05', title: 'Fall Break (Mon–Tue)' },
+            { date: '2026-11-25', title: 'Thanksgiving break starts' }
+        ];
+
+        function loadPackLists() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('packLists') || 'null');
+                if (saved && typeof saved === 'object') {
+                    return {
+                        Monday: saved.Monday || [...defaultPackLists.Monday],
+                        Tuesday: saved.Tuesday || [...defaultPackLists.Tuesday],
+                        Wednesday: saved.Wednesday || [...defaultPackLists.Wednesday],
+                        Thursday: saved.Thursday || [...defaultPackLists.Thursday],
+                        Friday: saved.Friday || [...defaultPackLists.Friday]
+                    };
+                }
+            } catch (e) {}
+            return {
+                Monday: [...defaultPackLists.Monday],
+                Tuesday: [...defaultPackLists.Tuesday],
+                Wednesday: [...defaultPackLists.Wednesday],
+                Thursday: [...defaultPackLists.Thursday],
+                Friday: [...defaultPackLists.Friday]
+            };
+        }
+
+        let packLists = loadPackLists();
+
+        function savePackLists() {
+            localStorage.setItem('packLists', JSON.stringify(packLists));
+        }
+
+        let activeDay = '';
         let isUserSelected = false;
         let activeClassId = null;
         let isSprintMode = localStorage.getItem('sprintMode') === 'true';
         let currentPrecipitation = 0;
+        let hourlyForecast = [];
+        let lastGps = null;
+        let gpsDenied = false;
+        let lastGpsAt = 0;
+        let lastLeaveVibrateKey = '';
+        let deferredPrompt = null;
+        let notified = JSON.parse(localStorage.getItem('navNotified') || '{}');
 
-        // Register Service Worker for Offline Capabilities
-        if ('serviceWorker' in navigator) {
-            const swCode = `self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`;
-            const swBlob = new Blob([swCode], { type: 'text/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+        function courseKey(title) {
+            if (title.startsWith('CHEM')) return 'chem';
+            if (title.startsWith('BIOL')) return 'biol';
+            if (title.startsWith('HLTH')) return 'hlth';
+            if (title.startsWith('HNRS')) return 'hnrs';
+            return 'other';
         }
 
-        // Fetch Open-Meteo Weather Data
-        async function fetchWeather() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6127&longitude=-77.3663&current=temperature_2m,precipitation,weather_code');
-                const data = await res.json();
-                const tempF = Math.round((data.current.temperature_2m * 9/5) + 32);
-                currentPrecipitation = data.current.precipitation;
-                
-                let conditionStr = `${tempF}°F, Clear`;
-                if (currentPrecipitation > 0) conditionStr = `${tempF}°F, 🌧️ Raining`;
-                
-                document.getElementById('weatherWidget').innerHTML = `<span>Greenville Weather</span><strong>${conditionStr}</strong>`;
-            } catch (e) {
-                document.getElementById('weatherWidget').innerHTML = `<span>Greenville Weather</span><strong>Unavailable</strong>`;
-            }
+        function ymd(date) {
+            return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
         }
-        fetchWeather();
 
-        // Live GPS Distance Calculation using Haversine formula
-        function trackGPS(destinationBuilding) {
-            const gpsWidget = document.getElementById('gpsWidget');
-            if (!navigator.geolocation) {
-                gpsWidget.innerHTML = "<span>GPS not supported</span>";
-                return;
-            }
-            const target = buildingCoords[destinationBuilding];
-            if (!target) {
-                gpsWidget.innerHTML = "<span>Location building unmapped</span>";
-                return;
-            }
+        function isNoClassDate(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6 || noClassDates.has(ymd(date));
+        }
 
-            navigator.geolocation.getCurrentPosition(pos => {
-                const lat1 = pos.coords.latitude;
-                const lon1 = pos.coords.longitude;
-                const R = 3958.8; // Radius of the earth in miles
-                const dLat = (target.lat - lat1) * Math.PI / 180;
-                const dLon = (target.lon - lon1) * Math.PI / 180;
-                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                          Math.cos(lat1 * Math.PI / 180) * Math.cos(target.lat * Math.PI / 180) *
-                          Math.sin(dLon/2) * Math.sin(dLon/2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                const distanceMiles = R * c;
-                const distanceFeet = Math.round(distanceMiles * 5280);
-                
-                gpsWidget.innerHTML = `<span>📍 Distance:</span><strong>${distanceFeet > 1000 ? (distanceMiles.toFixed(1) + ' mi') : (distanceFeet + ' ft away')}</strong>`;
-            }, () => {
-                gpsWidget.innerHTML = "<span>📍 GPS permission denied</span>";
+        function parseTime(timeStr, baseDate) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            const d = new Date(baseDate);
+            d.setHours(hours, minutes, 0, 0);
+            return d;
+        }
+
+        function minutesBetween(endStr, startStr) {
+            const [eh, em] = endStr.split(':').map(Number);
+            const [sh, sm] = startStr.split(':').map(Number);
+            return (sh * 60 + sm) - (eh * 60 + em);
+        }
+
+        function formatHMS(seconds) {
+            const d = Math.floor(seconds / 86400);
+            const h = Math.floor((seconds % 86400) / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            if (d > 0) return `${d}d ${h}h ${m}m`;
+            if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+
+        function formatClock(date) {
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        }
+
+        function haversineFeet(lat1, lon1, lat2, lon2) {
+            const R = 3958.8;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2) ** 2;
+            const miles = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return miles * 5280;
+        }
+
+        function nearestBuilding(lat, lon) {
+            let best = null;
+            let bestFeet = Infinity;
+            Object.entries(buildings).forEach(([key, b]) => {
+                const ft = haversineFeet(lat, lon, b.lat, b.lon);
+                if (ft < bestFeet) { bestFeet = ft; best = { key, feet: ft, ...b }; }
+            });
+            return best;
+        }
+
+        function walkPair(fromKey, toKey) {
+            if (!fromKey || !toKey || fromKey === toKey) return { normal: 2, sprint: 1 };
+            if (walkMatrix[fromKey] && walkMatrix[fromKey][toKey]) {
+                const [n, s] = walkMatrix[fromKey][toKey];
+                return { normal: n, sprint: s };
+            }
+            if (walkMatrix[toKey] && walkMatrix[toKey][fromKey]) {
+                const [n, s] = walkMatrix[toKey][fromKey];
+                return { normal: n, sprint: s };
+            }
+            return { normal: 8, sprint: 4 };
+        }
+
+        function rainPenalty(toKey) {
+            return currentPrecipitation > 0 ? (toKey === 'hsc' ? 5 : 3) : 0;
+        }
+
+        function walkMinutes(fromKey, toKey) {
+            const pair = walkPair(fromKey, toKey);
+            const base = isSprintMode ? pair.sprint : pair.normal;
+            return base + rainPenalty(toKey);
+        }
+
+        function onMainCampus(lat, lon) {
+            return ['scitech', 'brewster', 'austin', 'rawl', 'greene'].some(k => {
+                const b = buildings[k];
+                return haversineFeet(lat, lon, b.lat, b.lon) < 2640;
             });
         }
 
-        // Dark Mode Logic
+        function originForClass(dayName, index) {
+            if (lastGps && Date.now() - lastGpsAt < 120000) {
+                const near = nearestBuilding(lastGps.lat, lastGps.lon);
+                if (near.feet < 500) return near.key;
+                if (haversineFeet(lastGps.lat, lastGps.lon, buildings.hsc.lat, buildings.hsc.lon) < 1320) return 'hsc';
+            }
+            if (index <= 0) return 'greene';
+            const classes = schedule[dayName];
+            const prev = classes[index - 1];
+            const gap = minutesBetween(prev.end, classes[index].start);
+            if (gap <= 90) return prev.buildingKey;
+            if (lastGps && onMainCampus(lastGps.lat, lastGps.lon)) return nearestBuilding(lastGps.lat, lastGps.lon).key;
+            return 'greene';
+        }
+
+        function alreadyThere(toKey) {
+            if (!lastGps || Date.now() - lastGpsAt > 120000) return false;
+            const b = buildings[toKey];
+            return haversineFeet(lastGps.lat, lastGps.lon, b.lat, b.lon) < 400;
+        }
+
+        function mapLink(destKey, mode) {
+            const dest = buildings[destKey].maps;
+            let origin = buildings.greene.maps;
+            if (lastGps && Date.now() - lastGpsAt < 120000) origin = `${lastGps.lat},${lastGps.lon}`;
+            return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
+        }
+
+        function upcomingExams(title) {
+            const course = title.split(':')[0].trim();
+            const today = ymd(new Date());
+            return exams.filter(e => e.course === course && e.date >= today).sort((a,b) => a.date.localeCompare(b.date));
+        }
+
+        function daysUntil(dateStr) {
+            const t = new Date(dateStr + 'T00:00:00');
+            return Math.ceil((t - new Date().setHours(0,0,0,0)) / 86400000);
+        }
+
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3200);
+        }
+
+        function weatherLabel(code, precip) {
+            if (precip > 0 || (code >= 51 && code < 70) || (code >= 80 && code < 90)) return 'Raining';
+            if (code >= 95) return 'Storms';
+            if (code >= 71) return 'Snow';
+            if (code >= 45) return 'Fog';
+            if (code >= 2) return 'Cloudy';
+            return 'Clear';
+        }
+
+        async function fetchWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6127&longitude=-77.3663&current=temperature_2m,precipitation,weather_code&hourly=temperature_2m,precipitation&timezone=America%2FNew_York');
+                const data = await res.json();
+                const tempF = Math.round((data.current.temperature_2m * 9/5) + 32);
+                currentPrecipitation = data.current.precipitation || 0;
+                const label = weatherLabel(data.current.weather_code, currentPrecipitation);
+                document.getElementById('weatherWidget').innerHTML = `<span>Greenville</span><strong>${tempF}°F · ${label}</strong>`;
+
+                hourlyForecast = [];
+                const now = new Date();
+                data.hourly.time.forEach((iso, i) => {
+                    const t = new Date(iso);
+                    if (t >= now && hourlyForecast.length < 5) {
+                        hourlyForecast.push({
+                            hour: t.toLocaleTimeString('en-US', { hour: 'numeric' }),
+                            temp: Math.round((data.hourly.temperature_2m[i] * 9/5) + 32),
+                            precip: data.hourly.precipitation[i]
+                        });
+                    }
+                });
+                document.getElementById('hourlyRow').innerHTML = hourlyForecast.map(h =>
+                    `<div class="hourly-chip">${h.hour}<strong>${h.temp}°</strong>${h.precip > 0 ? 'Rain' : 'Dry'}</div>`
+                ).join('');
+            } catch (e) {
+                document.getElementById('weatherWidget').innerHTML = `<span>Greenville</span><strong>Unavailable</strong>`;
+            }
+        }
+
+        function rainDuringWindow() {
+            if (currentPrecipitation > 0) return true;
+            return hourlyForecast.some(h => h.precip > 0);
+        }
+
+        function maybeTrackGPS() {
+            if (gpsDenied || !navigator.geolocation) return;
+            const now = Date.now();
+            if (now - lastGpsAt < 45000) return;
+            navigator.geolocation.getCurrentPosition(pos => {
+                lastGps = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                lastGpsAt = Date.now();
+                const near = nearestBuilding(lastGps.lat, lastGps.lon);
+                const label = near.feet > 1000 ? `${(near.feet/5280).toFixed(1)} mi from ${near.label}` : `${Math.round(near.feet)} ft from ${near.label}`;
+                document.getElementById('gpsWidget').innerHTML = `<span>GPS</span><strong>${label}</strong>`;
+            }, () => {
+                gpsDenied = true;
+                document.getElementById('gpsWidget').innerHTML = `<span>GPS permission denied</span>`;
+            }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
+        }
+
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.getElementById('themeBtn').innerHTML = isDark ? '☀️ Light' : '🌙 Dark';
+            document.getElementById('themeBtn').textContent = isDark ? 'Light' : 'Dark';
         }
 
-        if (localStorage.getItem('theme') === 'dark') {
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.body.classList.add('dark-mode');
-            document.getElementById('themeBtn').innerHTML = '☀️ Light';
+            document.getElementById('themeBtn').textContent = 'Light';
         }
 
-        // Sprint Mode Toggle
         function toggleSprintMode() {
             isSprintMode = !isSprintMode;
             localStorage.setItem('sprintMode', isSprintMode);
@@ -729,128 +1061,79 @@
             const btn = document.getElementById('sprintBtn');
             if (isSprintMode) {
                 btn.classList.add('sprint-active');
-                btn.innerHTML = '⚡ Sprint ON';
+                btn.textContent = 'Sprint ON';
             } else {
                 btn.classList.remove('sprint-active');
-                btn.innerHTML = '⚡ Sprint Mode';
+                btn.textContent = 'Sprint';
             }
         }
 
-        // ICS Calendar Export Generator
-        function exportICS() {
-            let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//ECU Class Navigator//EN\n";
-            const dayMap = { Monday: 'MO', Tuesday: 'TU', Wednesday: 'WE', Thursday: 'TH', Friday: 'FR' };
-            
-            Object.keys(schedule).forEach(day => {
-                schedule[day].forEach(cls => {
-                    icsContent += "BEGIN:VEVENT\n";
-                    icsContent += `SUMMARY:${cls.title}\n`;
-                    icsContent += `LOCATION:${cls.building} - ${cls.room}\n`;
-                    icsContent += `DESCRIPTION:ECU Class Schedule Item\n`;
-                    icsContent += `END:VEVENT\n`;
-                });
-            });
-            icsContent += "END:VCALENDAR";
-
-            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.setAttribute('download', 'ecu_schedule.ics');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // JSON Backup & Restore Functions
-        function exportJSONBackup() {
-            const data = {
-                sprintMode: isSprintMode,
-                theme: localStorage.getItem('theme'),
-                exportDate: new Date().toISOString()
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.setAttribute('download', 'class_navigator_backup.json');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function importJSONBackup(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (parsed.theme) {
-                        localStorage.setItem('theme', parsed.theme);
-                        if (parsed.theme === 'dark') document.body.classList.add('dark-mode');
-                        else document.body.classList.remove('dark-mode');
-                    }
-                    if (parsed.sprintMode !== undefined) {
-                        isSprintMode = parsed.sprintMode;
-                        localStorage.setItem('sprintMode', isSprintMode);
-                        updateSprintUI();
-                    }
-                    alert("Settings restored successfully!");
-                    if (activeDay) renderDay(activeDay);
-                } catch (err) {
-                    alert("Invalid backup file format.");
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function getMapLink(destination) {
-            if (!destination) return null;
-            return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=walking`;
-        }
-
-        function parseTime(timeStr, baseDate) {
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            const d = new Date(baseDate);
-            d.setHours(hours, minutes, 0, 0);
-            return d;
-        }
-
-        function formatHMS(seconds) {
-            const d = Math.floor(seconds / 86400);
-            const h = Math.floor((seconds % 86400) / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            const s = Math.floor(seconds % 60);
-            
-            if (d > 0) return `${d}d ${h}h ${m}m`;
-            if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
-
         function enableNotifications() {
-            if ("Notification" in window) {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") alert("Push alerts enabled for upcoming classes!");
-                });
+            if (!('Notification' in window)) { showToast('Notifications not supported'); return; }
+            Notification.requestPermission().then(permission => {
+                updateNotifyBtn();
+                if (permission === 'granted') showToast('Alerts on: 15-min, leave-now, and rain');
+            });
+        }
+
+        function updateNotifyBtn() {
+            const btn = document.getElementById('notifyBtn');
+            if (!('Notification' in window)) { btn.textContent = 'Alerts unavailable'; return; }
+            btn.textContent = Notification.permission === 'granted' ? 'Class alerts on' : 'Enable class alerts';
+        }
+
+        function fireNotice(key, title, body) {
+            if (notified[key]) return;
+            notified[key] = true;
+            localStorage.setItem('navNotified', JSON.stringify(notified));
+            showToast(`${title}: ${body}`);
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try { new Notification(title, { body, tag: key }); } catch (e) {}
+            }
+        }
+
+        function checkAlerts(result, now) {
+            if (!result || result.type !== 'UPCOMING') return;
+            const dayKey = ymd(result.targetTime);
+            const secs = Math.max(0, Math.floor((result.targetTime - now) / 1000));
+            const walk = alreadyThere(result.cls.buildingKey) ? 2 : walkMinutes(result.fromKey, result.cls.buildingKey);
+            const leaveSecs = walk * 60;
+            const raining = currentPrecipitation > 0 || rainDuringWindow();
+
+            if (result.dayOffset === 0 && secs <= 900 && secs > leaveSecs) {
+                fireNotice(`${result.cls.id}-${dayKey}-15`, 'Class in 15 minutes', result.cls.title);
+            }
+            if (result.dayOffset === 0 && secs <= leaveSecs && secs > 0 && !alreadyThere(result.cls.buildingKey)) {
+                fireNotice(`${result.cls.id}-${dayKey}-leave`, 'Leave now', `${result.cls.title} · ${walk} min walk`);
+                const vk = `${result.cls.id}-${dayKey}`;
+                if (lastLeaveVibrateKey !== vk && navigator.vibrate) {
+                    navigator.vibrate([200, 80, 200]);
+                    lastLeaveVibrateKey = vk;
+                }
+            }
+            if (result.dayOffset === 0 && raining && secs <= 1800) {
+                fireNotice(`${result.cls.id}-${dayKey}-rain`, 'Rain on the walk', result.cls.title);
             }
         }
 
         function getNextClassStatus(now) {
-            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            
-            for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+            for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
                 const checkDate = new Date(now);
                 checkDate.setDate(now.getDate() + dayOffset);
-                const dayName = dayNames[checkDate.getDay()];
+                if (isNoClassDate(checkDate)) continue;
+                const dayName = DAY_NAMES[checkDate.getDay()];
                 const dayClasses = schedule[dayName] || [];
-
-                for (let cls of dayClasses) {
+                for (let i = 0; i < dayClasses.length; i++) {
+                    const cls = dayClasses[i];
                     const startTime = parseTime(cls.start, checkDate);
                     const endTime = parseTime(cls.end, checkDate);
-
+                    const fromKey = originForClass(dayName, i);
                     if (now >= startTime && now <= endTime && dayOffset === 0) {
-                        return { type: 'IN_CLASS', cls, targetTime: endTime, startTime: startTime };
-                    } else if (now < startTime) {
-                        return { type: 'UPCOMING', cls, targetTime: startTime, dayOffset, dayName };
+                        const next = dayClasses[i + 1] || null;
+                        return { type: 'IN_CLASS', cls, targetTime: endTime, startTime, dayName, index: i, fromKey, next };
+                    }
+                    if (now < startTime) {
+                        return { type: 'UPCOMING', cls, targetTime: startTime, dayOffset, dayName, index: i, fromKey };
                     }
                 }
             }
@@ -860,7 +1143,6 @@
         function updateTracker() {
             const now = new Date();
             const result = getNextClassStatus(now);
-
             const tagElem = document.getElementById('statusTag');
             const titleElem = document.getElementById('countdownTitle');
             const timerElem = document.getElementById('countdownTimer');
@@ -868,73 +1150,115 @@
             const banner = document.getElementById('statusBanner');
             const progContainer = document.getElementById('progressContainer');
             const progBar = document.getElementById('progressBar');
+            const leaveRow = document.getElementById('leaveRow');
+
+            const todayName = DAY_NAMES[now.getDay()];
+            const gpsRelevant = result && result.type === 'UPCOMING' && result.dayOffset === 0 && (result.targetTime - now) <= 20 * 60 * 1000;
+            if (gpsRelevant || (result && result.type === 'IN_CLASS')) maybeTrackGPS();
 
             if (!result) {
                 activeClassId = null;
-                tagElem.textContent = "Off Duty";
-                tagElem.className = "status-tag";
-                titleElem.textContent = "No schedule found";
-                timerElem.textContent = "--:--:--";
-                progContainer.style.display = "none";
-                return;
-            }
-
-            const secsRemaining = Math.max(0, Math.floor((result.targetTime - now) / 1000));
-
-            if (result.type === 'IN_CLASS') {
-                activeClassId = result.cls.id;
-                tagElem.textContent = "In Class";
-                tagElem.className = "status-tag in-class";
-                titleElem.textContent = result.cls.title;
-                timerElem.textContent = formatHMS(secsRemaining);
-                subtextElem.textContent = `Ends at ${result.cls.time.split('-')[1].trim()}`;
-                banner.classList.remove('sprint-alert', 'rain-alert');
-                
-                const totalDuration = result.targetTime - result.startTime;
-                const elapsed = now - result.startTime;
-                const percentage = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-                
-                progContainer.style.display = "block";
-                progBar.style.width = `${percentage}%`;
-
+                tagElem.textContent = 'Off Duty';
+                tagElem.className = 'status-tag';
+                titleElem.textContent = isNoClassDate(now) ? 'No classes today' : 'No schedule found';
+                timerElem.textContent = '--:--:--';
+                subtextElem.textContent = 'Enjoy the break';
+                progContainer.style.display = 'none';
+                leaveRow.style.display = 'none';
+                banner.classList.remove('sprint-alert', 'rain-alert', 'leave-now');
             } else {
-                activeClassId = null;
-                
-                // Trigger Rain Warning or Tight Transition Alert
-                if (currentPrecipitation > 0 && result.dayOffset === 0 && secsRemaining <= 1800) {
-                    banner.classList.add('rain-alert');
-                    banner.classList.remove('sprint-alert');
-                    tagElem.textContent = "🌧️ Rain Warning on Walk!";
-                } else if (result.dayOffset === 0 && secsRemaining <= 600) {
-                    banner.classList.add('sprint-alert');
-                    banner.classList.remove('rain-alert');
-                    tagElem.textContent = "⚡ Tight Transition!";
-                } else {
-                    banner.classList.remove('sprint-alert', 'rain-alert');
-                    tagElem.textContent = result.dayOffset === 0 ? "Up Next" : "Next Class";
-                }
+                const secsRemaining = Math.max(0, Math.floor((result.targetTime - now) / 1000));
+                checkAlerts(result, now);
 
-                tagElem.className = "status-tag";
-                titleElem.textContent = result.cls.title;
-                timerElem.textContent = formatHMS(secsRemaining);
-                
-                const startStr = result.cls.time.split('-')[0].trim();
-                subtextElem.textContent = result.dayOffset === 0 
-                    ? `Starts at ${startStr}` 
-                    : `Starts ${result.dayName} at ${startStr}`;
-                
-                progContainer.style.display = "none";
-                trackGPS(result.cls.building);
+                if (result.type === 'IN_CLASS') {
+                    activeClassId = result.cls.id;
+                    tagElem.textContent = 'In Class';
+                    tagElem.className = 'status-tag in-class';
+                    titleElem.textContent = result.cls.title;
+                    timerElem.textContent = formatHMS(secsRemaining);
+                    let sub = `Ends at ${result.cls.time.split('-')[1].trim()}`;
+                    if (result.next) {
+                        const w = walkMinutes(result.cls.buildingKey, result.next.buildingKey);
+                        sub += ` · then ${w} min to ${buildings[result.next.buildingKey].label}`;
+                    }
+                    subtextElem.textContent = sub;
+                    banner.classList.remove('sprint-alert', 'rain-alert', 'leave-now');
+                    leaveRow.style.display = 'none';
+                    const totalDuration = result.targetTime - result.startTime;
+                    const percentage = Math.min(100, Math.max(0, ((now - result.startTime) / totalDuration) * 100));
+                    progContainer.style.display = 'block';
+                    progBar.style.width = `${percentage}%`;
+                } else {
+                    activeClassId = null;
+                    const walk = alreadyThere(result.cls.buildingKey) ? 1 : walkMinutes(result.fromKey, result.cls.buildingKey);
+                    const leaveAt = new Date(result.targetTime.getTime() - walk * 60000);
+                    const shouldLeave = result.dayOffset === 0 && now >= leaveAt && now < result.targetTime && !alreadyThere(result.cls.buildingKey);
+                    const rainingWalk = currentPrecipitation > 0 && result.dayOffset === 0 && secsRemaining <= 1800;
+
+                    banner.classList.remove('sprint-alert', 'rain-alert', 'leave-now');
+                    if (shouldLeave) {
+                        banner.classList.add('leave-now');
+                        tagElem.textContent = 'Leave now';
+                    } else if (rainingWalk) {
+                        banner.classList.add('rain-alert');
+                        tagElem.textContent = 'Rain on the walk';
+                    } else if (result.dayOffset === 0 && secsRemaining <= 600) {
+                        banner.classList.add('sprint-alert');
+                        tagElem.textContent = 'Tight transition';
+                    } else {
+                        tagElem.textContent = result.dayOffset === 0 ? 'Up Next' : 'Next Class';
+                    }
+                    tagElem.className = 'status-tag';
+                    titleElem.textContent = result.cls.title;
+                    timerElem.textContent = formatHMS(secsRemaining);
+                    const startStr = result.cls.time.split('-')[0].trim();
+                    subtextElem.textContent = result.dayOffset === 0 ? `Starts at ${startStr}` : `Starts ${result.dayName} at ${startStr}`;
+                    progContainer.style.display = 'none';
+
+                    if (alreadyThere(result.cls.buildingKey)) {
+                        leaveRow.style.display = 'inline-flex';
+                        leaveRow.textContent = `You're at ${buildings[result.cls.buildingKey].label}`;
+                    } else if (result.dayOffset === 0) {
+                        leaveRow.style.display = 'inline-flex';
+                        const save = walkPair(result.fromKey, result.cls.buildingKey);
+                        const sprintHint = !isSprintMode && shouldLeave ? ` · Sprint saves ${save.normal - save.sprint} min` : '';
+                        leaveRow.textContent = `Leave ${buildings[result.fromKey].label} by ${formatClock(leaveAt)} · ${walk} min walk${sprintHint}`;
+                    } else {
+                        leaveRow.style.display = 'none';
+                    }
+                }
             }
 
-            const todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()];
             if (!isUserSelected) {
-                const defaultDay = (todayName === 'Saturday' || todayName === 'Sunday') ? 'Monday' : todayName;
+                const defaultDay = (todayName === 'Saturday' || todayName === 'Sunday' || isNoClassDate(now)) ? 'Monday' : todayName;
                 if (activeDay !== defaultDay) renderDay(defaultDay);
                 else highlightActiveClass();
             } else {
                 highlightActiveClass();
             }
+            updateViewingChip(now);
+        }
+
+        function actualTodayName(now) {
+            const n = now || new Date();
+            const name = DAY_NAMES[n.getDay()];
+            if (name === 'Saturday' || name === 'Sunday' || isNoClassDate(n)) return 'Monday';
+            return name;
+        }
+
+        function updateViewingChip(now) {
+            const chip = document.getElementById('viewingChip');
+            const today = actualTodayName(now);
+            if (isUserSelected && activeDay !== today) {
+                chip.classList.add('show');
+                document.getElementById('viewingText').textContent = `Viewing ${activeDay} · today is ${DAY_NAMES[now.getDay()]}`;
+            } else chip.classList.remove('show');
+        }
+
+        function jumpToToday() {
+            isUserSelected = false;
+            renderDay(actualTodayName(new Date()));
+            updateViewingChip(new Date());
         }
 
         function highlightActiveClass() {
@@ -942,11 +1266,10 @@
                 if (card.dataset.id === activeClassId) {
                     card.classList.add('is-active-class');
                     if (!card.querySelector('.live-badge')) {
-                        const header = card.querySelector('.card-header');
                         const badge = document.createElement('span');
                         badge.className = 'live-badge';
-                        badge.innerHTML = 'Now';
-                        header.appendChild(badge);
+                        badge.textContent = 'Now';
+                        card.querySelector('.card-header').appendChild(badge);
                     }
                 } else {
                     card.classList.remove('is-active-class');
@@ -959,82 +1282,237 @@
         function userSelectDay(day) {
             isUserSelected = true;
             renderDay(day);
+            updateViewingChip(new Date());
+        }
+
+        function bindChecks(root) {
+            root.querySelectorAll('input[type="checkbox"][data-store]').forEach(input => {
+                input.checked = localStorage.getItem(input.dataset.store) === '1';
+                input.addEventListener('change', () => localStorage.setItem(input.dataset.store, input.checked ? '1' : '0'));
+            });
+        }
+
+        function addPackItem(day) {
+            const input = document.getElementById('packAddInput');
+            const val = (input.value || '').trim();
+            if (!val) return;
+            packLists[day] = packLists[day] || [];
+            packLists[day].push(val);
+            savePackLists();
+            renderDay(day);
+        }
+
+        function removePackItem(day, index) {
+            packLists[day].splice(index, 1);
+            savePackLists();
+            renderDay(day);
+        }
+
+        function editPackItem(day, index, value) {
+            packLists[day][index] = value;
+            savePackLists();
+        }
+
+        function resetPackList(day) {
+            packLists[day] = [...defaultPackLists[day]];
+            savePackLists();
+            renderDay(day);
+        }
+
+        function renderWeekStrip() {
+            const todayName = DAY_NAMES[new Date().getDay()];
+            document.getElementById('weekStrip').innerHTML = ['Monday','Tuesday','Wednesday','Thursday','Friday'].map(day => {
+                const n = (schedule[day] || []).length;
+                const cls = [day === activeDay ? 'is-active' : '', day === todayName ? 'is-today' : ''].join(' ');
+                return `<button class="week-cell ${cls}" onclick="userSelectDay('${day}')"><small>${day.slice(0,3)}</small><strong>${n}</strong></button>`;
+            }).join('');
+            const soon = academicNotes.find(n => daysUntil(n.date) >= 0 && daysUntil(n.date) <= 10);
+            document.getElementById('weekHoliday').textContent = soon ? `Upcoming: ${soon.title} (${soon.date})` : '';
+            document.getElementById('calendarNote').textContent = soon ? soon.title : 'Fall 2026 · classes began Aug 17';
+        }
+
+        function escapeAttr(str) {
+            return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
         }
 
         function renderDay(day) {
             activeDay = day;
-            
             document.querySelectorAll('.day-btn').forEach(btn => {
-                if (btn.innerText.startsWith(day.substring(0,3))) btn.classList.add('active');
-                else btn.classList.remove('active');
+                btn.classList.toggle('active', btn.innerText.startsWith(day.substring(0,3)));
             });
-            
+            renderWeekStrip();
+
             const container = document.getElementById('scheduleContainer');
             container.innerHTML = '';
-            
             const classes = schedule[day] || [];
-            if (classes.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No classes scheduled</h3>
-                        <p>Enjoy your day off!</p>
-                    </div>
-                `;
+            const now = new Date();
+            const viewingToday = DAY_NAMES[now.getDay()] === day;
+
+            if (isNoClassDate(now) && viewingToday) {
+                container.innerHTML = `<div class="empty-state"><h3>University holiday / weekend</h3><p>Next class day is queued in the banner.</p></div>`;
                 return;
             }
-            
-            classes.forEach(cls => {
-                const mapLink = getMapLink(cls.building);
+
+            if (classes.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No classes scheduled</h3><p>Enjoy your day off!</p></div>`;
+                return;
+            }
+
+            const pack = packLists[day] || [];
+            const packCard = document.createElement('article');
+            packCard.className = 'pack-card';
+            packCard.innerHTML = `
+                <div class="pack-head">
+                    <div class="card-kicker">Morning pack list</div>
+                    <button type="button" onclick="resetPackList('${day}')">Reset</button>
+                </div>
+                <div class="pack-items">
+                    ${pack.map((item, i) => `
+                        <label class="pack-item">
+                            <input type="checkbox" data-store="pack-${day}-${i}">
+                            <input type="text" value="${escapeAttr(item)}" onchange="editPackItem('${day}', ${i}, this.value)" aria-label="Pack item">
+                            <button type="button" class="del" onclick="removePackItem('${day}', ${i})" aria-label="Remove item">×</button>
+                        </label>
+                    `).join('')}
+                </div>
+                <form class="pack-add" onsubmit="event.preventDefault(); addPackItem('${day}');">
+                    <input id="packAddInput" type="text" placeholder="Add item..." autocomplete="off">
+                    <button type="submit">Add</button>
+                </form>
+            `;
+            container.appendChild(packCard);
+
+            classes.forEach((cls, i) => {
+                const fromKey = originForClass(day, i);
+                const walkMins = alreadyThere(cls.buildingKey) ? 1 : walkMinutes(fromKey, cls.buildingKey);
+                const gap = i === 0 ? null : minutesBetween(classes[i-1].end, cls.start);
+                const end = parseTime(cls.end, now);
+                const isPast = viewingToday && now > end;
                 const isActive = cls.id === activeClassId;
-                const walkData = walkTimes[cls.building] || { normal: 8, sprint: 4 };
-                const walkMins = isSprintMode ? walkData.sprint : walkData.normal;
+                const nextExams = upcomingExams(cls.title);
+                const tightWalk = gap !== null && gap <= 20;
+                const map = mapLink(cls.buildingKey, 'walking');
 
                 const card = document.createElement('article');
-                card.className = `class-card ${isActive ? 'is-active-class' : ''}`;
+                card.className = `class-card course-${courseKey(cls.title)} ${isActive ? 'is-active-class' : ''} ${isPast ? 'is-past' : ''}`;
                 card.dataset.id = cls.id;
-                
                 card.innerHTML = `
                     <div class="card-header">
-                        <div class="class-time">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            ${cls.time}
-                        </div>
-                        <span class="walk-badge ${isSprintMode ? 'sprint-badge' : ''}">
-                            ${isSprintMode ? '⚡ Sprint' : '🚶 Walk'}: ~${walkMins}m
+                        <div class="class-time">${cls.time}</div>
+                        <span class="walk-badge ${isSprintMode || tightWalk ? 'sprint-badge' : ''} ${tightWalk ? 'tight-badge' : ''}">
+                            ${alreadyThere(cls.buildingKey) ? 'On site' : `${isSprintMode ? 'Sprint' : 'Walk'} from ${buildings[fromKey].label}: ~${walkMins}m`}
                         </span>
                     </div>
+                    ${nextExams.length ? `<span class="exam-badge">${nextExams[0].title} in ${daysUntil(nextExams[0].date)}d (${nextExams[0].date})</span>` : ''}
                     <h2 class="class-title">${cls.title}</h2>
-                    <div class="class-location">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        ${cls.room}
-                    </div>
-                    ${cls.checklist ? `
-                    <div class="checklist-container">
-                        <div class="checklist-title">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                            Lab Gear Checklist
-                        </div>
-                        <div class="checklist-items">
-                            ${cls.checklist.map(item => `
-                                <label class="checklist-item">
-                                    <input type="checkbox"> ${item}
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>` : ''}
-                    ${mapLink 
-                        ? `<a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="nav-btn ${isSprintMode ? 'sprint-btn' : ''}">
-                            ${isSprintMode ? '⚡ Sprint Directions' : 'Get Directions'}
-                           </a>`
-                        : `<span class="nav-btn disabled">Location Pending</span>`
-                    }
+                    <div class="class-location">${cls.room}</div>
+                    ${cls.checklist ? `<div class="checklist-container">
+                        <div class="checklist-title">Lab gear checklist</div>
+                        <div class="checklist-items">${cls.checklist.map(item => `
+                            <label class="checklist-item"><input type="checkbox" data-store="check-${cls.id}-${item}"> ${item}</label>`).join('')}
+                        </div></div>` : ''}
+                    ${cls.buildingKey === 'hsc' ? `<div class="nav-row two">
+                        <a href="${map}" target="_blank" rel="noopener" class="nav-btn ${isSprintMode ? 'sprint-btn' : ''}">Walk</a>
+                        <a href="${mapLink('hsc','transit')}" target="_blank" rel="noopener" class="nav-btn ghost">Transit 302</a>
+                    </div>` : `<a href="${map}" target="_blank" rel="noopener" class="nav-btn ${isSprintMode ? 'sprint-btn' : ''}">${isSprintMode ? 'Sprint directions' : 'Get directions'}</a>`}
                 `;
+                if (isPast) {
+                    const done = document.createElement('span');
+                    done.className = 'done-badge';
+                    done.textContent = 'Done';
+                    card.querySelector('.card-header').appendChild(done);
+                }
                 container.appendChild(card);
             });
+
+            bindChecks(container);
         }
 
-        // Init
+        function icsDate(date, hhmm) {
+            const [h, m] = hhmm.split(':').map(Number);
+            const d = new Date(date);
+            d.setHours(h, m, 0, 0);
+            const p = n => String(n).padStart(2,'0');
+            return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+        }
+
+        function exportICS() {
+            const start = new Date(TERM_START + 'T00:00:00');
+            let body = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//ECU Class Navigator//EN\r\nCALSCALE:GREGORIAN\r\n';
+            const byDay = { Monday: 'MO', Tuesday: 'TU', Wednesday: 'WE', Thursday: 'TH', Friday: 'FR' };
+            Object.entries(schedule).forEach(([day, classes]) => {
+                classes.forEach(cls => {
+                    const first = new Date(start);
+                    while (DAY_NAMES[first.getDay()] !== day) first.setDate(first.getDate() + 1);
+                    const ex = [...noClassDates].map(d => icsDate(new Date(d + 'T00:00:00'), cls.start)).join(',');
+                    body += `BEGIN:VEVENT\r\nUID:${cls.id}@classnav.ecu\r\nSUMMARY:${cls.title}\r\nLOCATION:${cls.room}\r\nDTSTART;TZID=America/New_York:${icsDate(first, cls.start)}\r\nDTEND;TZID=America/New_York:${icsDate(first, cls.end)}\r\nRRULE:FREQ=WEEKLY;BYDAY=${byDay[day]};UNTIL=${TERM_END}\r\n${ex ? 'EXDATE;TZID=America/New_York:' + ex + '\r\n' : ''}END:VEVENT\r\n`;
+                });
+            });
+            body += 'END:VCALENDAR\r\n';
+            const blob = new Blob([body], { type: 'text/calendar' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'ecu-class-navigator.ics';
+            a.click();
+            showToast('Calendar file downloaded');
+        }
+
+        function generateIcon() {
+            const c = document.createElement('canvas');
+            c.width = 192; c.height = 192;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#592A8A';
+            ctx.fillRect(0, 0, 192, 192);
+            ctx.beginPath(); ctx.arc(96, 96, 48, 0, Math.PI * 2); ctx.fillStyle = '#FDC82F'; ctx.fill();
+            ctx.fillStyle = '#3D1C60';
+            ctx.font = '800 52px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CN', 96, 100);
+            return c.toDataURL('image/png');
+        }
+
+        function setupPWA() {
+            const icon = generateIcon();
+            let apple = document.querySelector('link[rel="apple-touch-icon"]');
+            if (!apple) {
+                apple = document.createElement('link');
+                apple.rel = 'apple-touch-icon';
+                document.head.appendChild(apple);
+            }
+            apple.href = icon;
+            const manifest = {
+                name: 'Class Navigator — ECU',
+                short_name: 'Class Nav',
+                start_url: '.',
+                display: 'standalone',
+                background_color: '#592A8A',
+                theme_color: '#592A8A',
+                icons: [{ src: icon, sizes: '192x192', type: 'image/png', purpose: 'any maskable' }]
+            };
+            document.getElementById('manifestLink').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' }));
+        }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.finally(() => { deferredPrompt = null; });
+                return;
+            }
+            showToast('In your browser menu, choose Add to Home Screen');
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').textContent = 'Install app';
+        });
+
         updateSprintUI();
+        updateNotifyBtn();
+        setupPWA();
+        fetchWeather();
+        setInterval(fetchWeather, 15 * 60 * 1000);
         updateTracker();
         setInterval(updateTracker, 1000);
     </script>
