@@ -27,9 +27,10 @@
             --live-green-bg: rgba(16, 185, 129, 0.1);
             --alert-bg: #FEF2F2;
             --alert-text: #B91C1C;
+            --sprint-amber: #D97706;
+            --sprint-amber-bg: rgba(217, 119, 6, 0.12);
         }
 
-        /* Dark Mode Theme Variables */
         body.dark-mode {
             --bg-canvas: #0F172A;
             --surface: #1E293B;
@@ -79,7 +80,7 @@
                 min-width: 500px;
             }
             .sidebar {
-                width: 320px;
+                width: 340px;
                 position: sticky;
                 top: 40px;
             }
@@ -95,10 +96,10 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .theme-toggle-btn {
+        .toggle-btn {
             background: var(--surface);
             border: 1px solid var(--border-subtle);
             color: var(--text-primary);
@@ -111,6 +112,14 @@
             align-items: center;
             gap: 6px;
             box-shadow: var(--shadow-subtle);
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.sprint-active {
+            background: var(--ecu-gold);
+            color: #000;
+            border-color: #EAB308;
+            font-weight: 800;
         }
 
         .brand-badge {
@@ -153,17 +162,12 @@
             box-shadow: var(--shadow-active);
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .status-banner::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(253, 200, 47, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
-            pointer-events: none;
+        .status-banner.sprint-alert {
+            background: linear-gradient(135deg, #7C2D12 0%, #451A03 100%);
+            border: 2px solid var(--ecu-gold);
         }
 
         .status-header {
@@ -231,7 +235,7 @@
             transition: width 1s linear;
         }
 
-        /* Sidebar Utilities */
+        /* Sidebar Utilities & Deadline Tracker */
         .utility-card {
             background: var(--surface);
             border-radius: var(--radius-card);
@@ -250,7 +254,7 @@
             margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
         }
 
         .utility-link {
@@ -265,7 +269,6 @@
             font-weight: 600;
             font-size: 0.875rem;
             margin-bottom: 8px;
-            transition: background 0.2s;
         }
 
         .btn-notify {
@@ -277,12 +280,84 @@
             border-radius: var(--radius-btn);
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
-        body.dark-mode .btn-notify {
-            color: #C084FC;
+        body.dark-mode .btn-notify { color: #C084FC; }
+
+        /* Deadline Tracker Form & List */
+        .add-task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
         }
+
+        .task-input, .task-date {
+            padding: 10px 12px;
+            border-radius: var(--radius-btn);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-canvas);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.8125rem;
+        }
+
+        .btn-add-task {
+            padding: 10px;
+            background: var(--ecu-purple);
+            color: white;
+            border: none;
+            border-radius: var(--radius-btn);
+            font-weight: 700;
+            font-size: 0.8125rem;
+            cursor: pointer;
+        }
+
+        .task-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--bg-canvas);
+            border-radius: 10px;
+            font-size: 0.8125rem;
+        }
+
+        .task-item.completed span {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .task-date-tag {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .delete-task-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .delete-task-btn:hover { color: var(--alert-text); }
 
         /* Day Selector */
         .day-selector { 
@@ -322,7 +397,6 @@
             margin-bottom: 14px; 
             box-shadow: var(--shadow-subtle);
             border: 1px solid var(--border-subtle);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .class-card.is-active-class {
@@ -347,6 +421,22 @@
             background: var(--bg-canvas);
             padding: 4px 10px;
             border-radius: 6px;
+        }
+
+        .walk-badge {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: var(--bg-canvas);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .walk-badge.sprint-badge {
+            background: var(--sprint-amber-bg);
+            color: var(--sprint-amber);
+            border-color: rgba(217, 119, 6, 0.3);
         }
 
         .live-badge {
@@ -395,7 +485,6 @@
             font-weight: 500;
         }
 
-        /* Interactive Checklist for Labs */
         .checklist-container {
             background: var(--alert-bg);
             color: var(--alert-text);
@@ -452,6 +541,10 @@
             transition: all 0.2s ease;
         }
 
+        .nav-btn.sprint-btn {
+            background-color: var(--sprint-amber);
+        }
+
         .nav-btn:active { transform: scale(0.98); }
 
         .empty-state {
@@ -470,11 +563,22 @@
         <aside class="sidebar">
             <div class="utility-card">
                 <div class="utility-header">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    Campus Utilities
+                    <span>📝 Deadline Tracker</span>
+                </div>
+                <form class="add-task-form" onsubmit="addAssignment(event)">
+                    <input type="text" id="taskTitle" class="task-input" placeholder="e.g. Chem Lab Report" required>
+                    <input type="date" id="taskDate" class="task-date" required>
+                    <button type="submit" class="btn-add-task">+ Add Item</button>
+                </form>
+                <ul class="task-list" id="taskList"></ul>
+            </div>
+
+            <div class="utility-card">
+                <div class="utility-header">
+                    <span>📍 Campus Utilities</span>
                 </div>
                 <a href="https://transit.ecu.edu/" target="_blank" class="utility-link">
-                    ECU Bus Tracker (Pirate Express)
+                    ECU Bus Tracker
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 </a>
                 <a href="https://weather.com/weather/today/l/Greenville+NC" target="_blank" class="utility-link">
@@ -489,14 +593,17 @@
             <header>
                 <h1>Class Navigator</h1>
                 <div class="header-actions">
-                    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">
+                    <button class="toggle-btn" onclick="toggleSprintMode()" id="sprintBtn">
+                        ⚡ Sprint
+                    </button>
+                    <button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">
                         🌙 Dark
                     </button>
                     <div class="brand-badge">ECU</div>
                 </div>
             </header>
 
-            <div class="status-banner">
+            <div class="status-banner" id="statusBanner">
                 <div class="status-header">
                     <span class="status-tag" id="statusTag">Schedule Tracker</span>
                 </div>
@@ -524,7 +631,15 @@
     <script>
         const origin = "Greene Hall, East Carolina University";
         
-        // Accurate Schedule matching Schedule.pdf
+        // Estimated walking mins from Greene Hall (Normal vs Sprint)
+        const walkTimes = {
+            "Science and Technology Building, East Carolina University": { normal: 8, sprint: 4 },
+            "Brewster Building, East Carolina University": { normal: 6, sprint: 3 },
+            "Austin Building, East Carolina University": { normal: 5, sprint: 2 },
+            "Rawl Building, East Carolina University": { normal: 7, sprint: 3 },
+            "Health Sciences Campus, East Carolina University": { normal: 25, sprint: 12 }
+        };
+
         const schedule = {
             Monday: [
                 { id: "mon-1", time: "09:00 AM - 09:50 AM", start: "09:00", end: "09:50", title: "CHEM 1150: General Chemistry I", room: "Sci & Tech, 0C307", building: "Science and Technology Building, East Carolina University" },
@@ -553,7 +668,11 @@
         let activeDay = "";
         let isUserSelected = false;
         let activeClassId = null;
-        let notifiedClasses = new Set();
+        let isSprintMode = localStorage.getItem('sprintMode') === 'true';
+        let assignments = JSON.parse(localStorage.getItem('assignments')) || [
+            { id: 1, title: "Chem 1151 Pre-Lab", date: "2026-09-02", completed: false },
+            { id: 2, title: "Biology Chapter 1 Quiz", date: "2026-09-04", completed: false }
+        ];
 
         // Dark Mode Logic
         function toggleTheme() {
@@ -566,6 +685,78 @@
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
             document.getElementById('themeBtn').innerHTML = '☀️ Light';
+        }
+
+        // Sprint Mode Toggle
+        function toggleSprintMode() {
+            isSprintMode = !isSprintMode;
+            localStorage.setItem('sprintMode', isSprintMode);
+            updateSprintUI();
+            if (activeDay) renderDay(activeDay);
+        }
+
+        function updateSprintUI() {
+            const btn = document.getElementById('sprintBtn');
+            if (isSprintMode) {
+                btn.classList.add('sprint-active');
+                btn.innerHTML = '⚡ Sprint ON';
+            } else {
+                btn.classList.remove('sprint-active');
+                btn.innerHTML = '⚡ Sprint Mode';
+            }
+        }
+
+        // Assignment Tracker Functions
+        function saveAssignments() {
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            renderAssignments();
+        }
+
+        function addAssignment(e) {
+            e.preventDefault();
+            const title = document.getElementById('taskTitle').value;
+            const date = document.getElementById('taskDate').value;
+            if (!title || !date) return;
+
+            assignments.push({ id: Date.now(), title, date, completed: false });
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDate').value = '';
+            saveAssignments();
+        }
+
+        function toggleAssignment(id) {
+            assignments = assignments.map(a => a.id === id ? { ...a, completed: !a.completed } : a);
+            saveAssignments();
+        }
+
+        function deleteAssignment(id) {
+            assignments = assignments.filter(a => a.id !== id);
+            saveAssignments();
+        }
+
+        function renderAssignments() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            if (assignments.length === 0) {
+                list.innerHTML = '<li style="font-size:0.75rem; color:var(--text-muted);">No upcoming tasks.</li>';
+                return;
+            }
+
+            assignments.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="task-meta">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleAssignment(${task.id})">
+                            <span>${task.title}</span>
+                        </label>
+                        <span class="task-date-tag">Due: ${task.date}</span>
+                    </div>
+                    <button class="delete-task-btn" onclick="deleteAssignment(${task.id})">✕</button>
+                `;
+                list.appendChild(li);
+            });
         }
 
         function getMapLink(destination) {
@@ -630,6 +821,7 @@
             const titleElem = document.getElementById('countdownTitle');
             const timerElem = document.getElementById('countdownTimer');
             const subtextElem = document.getElementById('countdownSubtext');
+            const banner = document.getElementById('statusBanner');
             const progContainer = document.getElementById('progressContainer');
             const progBar = document.getElementById('progressBar');
 
@@ -652,6 +844,7 @@
                 titleElem.textContent = result.cls.title;
                 timerElem.textContent = formatHMS(secsRemaining);
                 subtextElem.textContent = `Ends at ${result.cls.time.split('-')[1].trim()}`;
+                banner.classList.remove('sprint-alert');
                 
                 const totalDuration = result.targetTime - result.startTime;
                 const elapsed = now - result.startTime;
@@ -663,16 +856,15 @@
             } else {
                 activeClassId = null;
                 
-                if (secsRemaining <= 900 && secsRemaining > 890 && !notifiedClasses.has(result.cls.id)) {
-                    if (Notification.permission === 'granted') {
-                        new Notification('Class Starting Soon', {
-                            body: `Time to walk to ${result.cls.building} for ${result.cls.title}.`
-                        });
-                        notifiedClasses.add(result.cls.id);
-                    }
+                // Tight transition check (<10 min away trigger Sprint Alert)
+                if (result.dayOffset === 0 && secsRemaining <= 600) {
+                    banner.classList.add('sprint-alert');
+                    tagElem.textContent = "⚡ Tight Transition!";
+                } else {
+                    banner.classList.remove('sprint-alert');
+                    tagElem.textContent = result.dayOffset === 0 ? "Up Next" : "Next Class";
                 }
 
-                tagElem.textContent = result.dayOffset === 0 ? "Up Next" : "Next Class";
                 tagElem.className = "status-tag";
                 titleElem.textContent = result.cls.title;
                 timerElem.textContent = formatHMS(secsRemaining);
@@ -744,6 +936,9 @@
             classes.forEach(cls => {
                 const mapLink = getMapLink(cls.building);
                 const isActive = cls.id === activeClassId;
+                const walkData = walkTimes[cls.building] || { normal: 8, sprint: 4 };
+                const walkMins = isSprintMode ? walkData.sprint : walkData.normal;
+
                 const card = document.createElement('article');
                 card.className = `class-card ${isActive ? 'is-active-class' : ''}`;
                 card.dataset.id = cls.id;
@@ -754,7 +949,9 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                             ${cls.time}
                         </div>
-                        ${isActive ? '<span class="live-badge">Now</span>' : ''}
+                        <span class="walk-badge ${isSprintMode ? 'sprint-badge' : ''}">
+                            ${isSprintMode ? '⚡ Sprint' : '🚶 Walk'}: ~${walkMins}m
+                        </span>
                     </div>
                     <h2 class="class-title">${cls.title}</h2>
                     <div class="class-location">
@@ -776,8 +973,8 @@
                         </div>
                     </div>` : ''}
                     ${mapLink 
-                        ? `<a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="nav-btn">
-                            Get Directions
+                        ? `<a href="${mapLink}" target="_blank" rel="noopener noreferrer" class="nav-btn ${isSprintMode ? 'sprint-btn' : ''}">
+                            ${isSprintMode ? '⚡ Sprint Directions' : 'Get Directions'}
                            </a>`
                         : `<span class="nav-btn disabled">Location Pending</span>`
                     }
@@ -786,6 +983,9 @@
             });
         }
 
+        // Init
+        updateSprintUI();
+        renderAssignments();
         updateTracker();
         setInterval(updateTracker, 1000);
     </script>
