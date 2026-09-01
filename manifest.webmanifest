@@ -1,0 +1,14 @@
+{
+  "name": "ECU Class Navigator",
+  "short_name": "Class Nav",
+  "description": "ECU schedule, live walking estimates, and Route 302 reminders.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#592a8a",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

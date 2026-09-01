@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f2f2f7" id="themeColorMeta">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Class Nav">
+  <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">
+  <meta name="description" content="An ECU class schedule with live walking estimates and Route 302 reminders.">
+  <title>Class Navigator — ECU</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --ui: "DM Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      --display: "Manrope", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --purple: #592a8a;
+      --purple-deep: #3d1c60;
+      --gold: #fdc82f;
+      --blue: #2563eb;
+      --green: #16865a;
+      --page: #f2f2f7;
+      --surface: #fff;
+      --surface-alt: #f7f7fa;
+      --text: #111218;
+      --muted: #626574;
+      --border: rgba(17,18,24,.1);
+      --purple-soft: rgba(89,42,138,.1);
+      --blue-soft: rgba(37,99,235,.1);
+      --green-soft: rgba(22,134,90,.1);
+      --shadow: 0 10px 28px rgba(20,20,30,.07);
+      --safe-top: max(env(safe-area-inset-top), 12px);
+      --safe-bottom: max(env(safe-area-inset-bottom), 18px);
+    }
+    html[data-theme="dark"] {
+      --page: #000;
+      --surface: #1c1c1e;
+      --surface-alt: #27272a;
+      --text: #f5f5f7;
+      --muted: #aeaeb2;
+      --border: rgba(255,255,255,.1);
+      --purple-soft: rgba(170,117,255,.18);
+      --blue-soft: rgba(95,161,255,.17);
+      --green-soft: rgba(58,202,130,.17);
+      --shadow: none;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--page); -webkit-text-size-adjust: 100%; }
+    body {
+      min-height: 100dvh;
+      padding: calc(var(--safe-top) + 8px) 16px calc(var(--safe-bottom) + 20px);
+      color: var(--text);
+      background: radial-gradient(900px 380px at 0 -10%, rgba(253,200,47,.1), transparent 58%), var(--page);
+      font: 16px/1.45 var(--ui);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, a { font: inherit; }
+    button { border: 0; cursor: pointer; color: inherit; -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    :focus-visible { outline: 3px solid rgba(89,42,138,.55); outline-offset: 3px; }
+    .app { width: min(100%, 1120px); margin: 0 auto; display: grid; gap: 18px; }
+    @media (min-width: 930px) {
+      .app { grid-template-columns: minmax(0,1.5fr) minmax(300px,.72fr); align-items: start; }
+      aside { position: sticky; top: 20px; }
+    }
+    header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 4px 2px 20px; }
+    .brand { color: var(--purple); font: 800 12px var(--display); letter-spacing: .16em; text-transform: uppercase; margin-bottom: 8px; }
+    .brand::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 2px; background: var(--gold); }
+    h1 { font: 800 clamp(1.85rem,1.5rem + 1vw,2.45rem)/1.05 var(--display); letter-spacing: -.05em; }
+    .date { margin-top: 8px; color: var(--muted); font-size: 14px; }
+    .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .week { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 14px; }
+    .week button { min-height: 59px; padding: 8px 3px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); color: var(--muted); box-shadow: var(--shadow); }
+    .week small, .week strong { display: block; }
+    .week small { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .week strong { margin-top: 2px; color: var(--text); font-size: 16px; }
+    .week button.active { color: #fff; background: var(--purple); border-color: var(--purple); }
+    .week button.active strong { color: #fff; }
+    .status { position: relative; overflow: hidden; padding: 22px; margin-bottom: 14px; border-radius: 16px; color: #fff; background: linear-gradient(135deg,var(--purple),var(--purple-deep)); box-shadow: 0 18px 38px rgba(61,28,96,.23); }
+    .status.leave { animation: glow 1.7s ease-in-out infinite; }
+    .status-tag { display: inline-flex; min-height: 27px; align-items: center; padding: 0 9px; margin-bottom: 10px; border-radius: 999px; background: rgba(255,255,255,.14); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .status-title { font: 700 clamp(1.15rem,1rem + .5vw,1.45rem) var(--display); }
+    .timer { margin: 8px 0 2px; font: 800 clamp(2.1rem,1.6rem + 2vw,3.45rem)/1 var(--display); letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+    .status-sub { color: rgba(255,255,255,.74); font-size: 14px; }
+    .leave-row { display: inline-flex; margin-top: 13px; padding: 8px 11px; border-radius: 9px; color: #211300; background: var(--gold); font-size: 13px; font-weight: 800; }
+    .day-nav { display: flex; gap: 7px; overflow-x: auto; padding: 2px 0 14px; }
+    .day-nav button { flex: 1; min-width: 54px; min-height: 40px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font-weight: 700; }
+    .day-nav button.active { color: var(--purple); border-color: rgba(89,42,138,.35); background: var(--purple-soft); }
+    .class-card, .utility { padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+    .class-card.past { opacity: .58; }
+    .class-card.current { border-color: rgba(22,134,90,.45); }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .time, .travel { display: inline-flex; align-items: center; min-height: 28px; padding: 0 9px; border-radius: 8px; font-size: 12px; font-weight: 800; }
+    .time { color: var(--purple); background: var(--purple-soft); }
+    .travel { color: var(--blue); background: var(--blue-soft); text-align: right; }
+    .class-title { font: 700 1.08rem/1.3 var(--display); letter-spacing: -.02em; }
+    .room { margin-top: 5px; color: var(--muted); font-size: 14px; }
+    .live { display: inline-flex; margin-bottom: 8px; color: var(--green); font-size: 12px; font-weight: 800; }
+    .bus-box { margin-top: 14px; padding: 13px; border: 1px solid rgba(253,200,47,.45); border-radius: 11px; background: rgba(253,200,47,.1); }
+    .bus-box strong { display: block; color: var(--purple); font-size: 13px; }
+    .bus-box span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .action, .utility-btn { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 13px; border-radius: 10px; color: #fff; background: var(--purple); font-size: 13px; font-weight: 800; }
+    .action.secondary { color: var(--blue); background: var(--blue-soft); }
+    .utility { padding: 17px; }
+    .utility h2 { margin-bottom: 13px; font: 800 13px var(--display); letter-spacing: .08em; text-transform: uppercase; }
+    .condition { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+    .condition strong { color: var(--text); text-align: right; }
+    .utility-btn { width: 100%; margin-top: 9px; }
+    .utility-btn.secondary { color: var(--purple); background: var(--purple-soft); }
+    .hint { margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .empty { padding: 28px; border: 1px solid var(--border); border-radius: 15px; color: var(--muted); background: var(--surface); text-align: center; }
+    .toast { position: fixed; z-index: 10; left: 50%; bottom: calc(var(--safe-bottom) + 10px); width: min(calc(100% - 32px),480px); padding: 12px 15px; border-radius: 12px; color: #fff; background: rgba(24,24,28,.94); text-align: center; font-size: 14px; font-weight: 700; transform: translate(-50%,24px); opacity: 0; pointer-events: none; transition: .22s ease; }
+    .toast.show { transform: translate(-50%,0); opacity: 1; }
+    @keyframes glow { 50% { box-shadow: 0 0 0 4px rgba(253,200,47,.25),0 18px 38px rgba(61,28,96,.23); } }
+    @media (hover:hover) { button:hover, .action:hover { transform: translateY(-1px); } }
+    @media (max-width:520px) { .card-top { align-items: flex-start; } .travel { max-width: 48%; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation: none!important; transition: none!important; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <main>
+      <header>
+        <div><div class="brand">ECU</div><h1>Class Navigator</h1><p class="date" id="headerDate"></p></div>
+        <button class="icon-btn" id="themeBtn" aria-label="Switch appearance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      </header>
+      <div class="week" id="weekStrip"></div>
+      <section class="status" id="statusCard" aria-live="polite">
+        <span class="status-tag" id="statusTag">Next class</span>
+        <div class="status-title" id="statusTitle">Loading schedule…</div>
+        <div class="timer" id="timer">--:--:--</div>
+        <div class="status-sub" id="statusSub">Checking your day</div>
+        <div class="leave-row" id="leaveRow">Calculating travel time</div>
+      </section>
+      <nav class="day-nav" aria-label="Choose a weekday">
+        <button data-day="Monday">Mon</button><button data-day="Tuesday">Tue</button><button data-day="Wednesday">Wed</button><button data-day="Thursday">Thu</button><button data-day="Friday">Fri</button>
+      </nav>
+      <section id="scheduleContainer" aria-live="polite"></section>
+    </main>
+    <aside>
+      <section class="utility">
+        <h2>Campus conditions</h2>
+        <div class="condition"><span>Weather</span><strong id="weather">Loading…</strong></div>
+        <div class="condition"><span>Your location</span><strong id="gpsStatus">Not enabled</strong></div>
+        <button class="utility-btn" id="locationBtn">Use my location</button>
+        <button class="utility-btn secondary" id="notifyBtn">Enable live reminders</button>
+        <button class="utility-btn secondary" id="calendarBtn">Add schedule + bus alert</button>
+        <p class="hint">For iPhone reminders, add this site to your Home Screen first. The calendar export includes a Route 302 alert that works even when this app is closed.</p>
+      </section>
+      <section class="utility">
+        <h2>Route 302</h2>
+        <div class="condition"><span>Frequency</span><strong>Every 30 minutes</strong></div>
+        <div class="condition"><span>Service</span><strong>Mon–Fri · 7 AM–6 PM</strong></div>
+        <div class="condition"><span>Survey trip</span><strong>3:00 PM from Main Campus</strong></div>
+        <a class="utility-btn secondary" href="https://transit.ecu.edu/bus-routes/route-302/" target="_blank" rel="noopener">View official route</a>
+      </section>
+    </aside>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script>
+    const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const TERM_START = "2026-08-17";
+    const buildings = {
+      greene: { label:"Greene Hall", maps:"Greene Hall, East Carolina University", lat:35.6056, lon:-77.3668 },
+      scitech: { label:"Sci & Tech", maps:"Science and Technology Building, East Carolina University", lat:35.6085, lon:-77.3650 },
+      brewster: { label:"Brewster", maps:"Brewster Building, East Carolina University", lat:35.6092, lon:-77.3705 },
+      austin: { label:"Austin", maps:"Austin Building, East Carolina University", lat:35.6078, lon:-77.3680 },
+      rawl: { label:"Rawl", maps:"Rawl Building, East Carolina University", lat:35.6080, lon:-77.3695 },
+      studentcenter: { label:"Main Campus Student Center", maps:"Main Campus Student Center, East Carolina University", lat:35.6063, lon:-77.3696 },
+      hsc: { label:"Health Sciences", maps:"Health Sciences Campus, East Carolina University", lat:35.5870, lon:-77.3820 }
+    };
+    const matrix = {
+      greene:{scitech:8,brewster:6,austin:5,rawl:7,studentcenter:7},
+      scitech:{brewster:6,austin:5,rawl:6,studentcenter:8},
+      brewster:{austin:4,rawl:4,studentcenter:5},
+      austin:{rawl:5,studentcenter:5}, rawl:{studentcenter:4}
+    };
+    const schedule = {
+      Monday:[
+        {id:"mon-1",time:"09:00 AM – 09:50 AM",start:"09:00",end:"09:50",title:"CHEM 1150: General Chemistry I",room:"Sci & Tech, 0C307",building:"scitech"}
+      ],
+      Tuesday:[
+        {id:"tue-1",time:"09:00 AM – 09:50 AM",start:"09:00",end:"09:50",title:"HLTH 1000: Health in Modern Society",room:"Brewster, 0C302",building:"brewster"},
+        {id:"tue-2",time:"11:00 AM – 12:15 PM",start:"11:00",end:"12:15",title:"HNRS 2011: BLS Sem in Human",room:"Brewster, 0D207",building:"brewster"},
+        {id:"tue-3",time:"12:30 PM – 01:45 PM",start:"12:30",end:"13:45",title:"BIOL 1100: Principles of Biology I",room:"Austin, 00205",building:"austin"},
+        {id:"tue-4",time:"05:00 PM – 07:00 PM",start:"17:00",end:"19:00",title:"HNRS 2000: Honors Leadership & Service Colloquium",room:"Rawl, 00205",building:"rawl"}
+      ],
+      Wednesday:[
+        {id:"wed-1",time:"09:00 AM – 09:50 AM",start:"09:00",end:"09:50",title:"CHEM 1150: General Chemistry I",room:"Sci & Tech, 0C307",building:"scitech"},
+        {id:"wed-2",time:"11:00 AM – 01:50 PM",start:"11:00",end:"13:50",title:"CHEM 1151: General Chemistry Lab I",room:"Sci & Tech, 00432",building:"scitech"},
+        {id:"wed-3",time:"03:30 PM – 06:30 PM",start:"15:30",end:"18:30",title:"HNRS 2002: Survey of Health Professions",room:"Health Sciences Campus",building:"hsc",route302:true}
+      ],
+      Thursday:[
+        {id:"thu-1",time:"11:00 AM – 12:15 PM",start:"11:00",end:"12:15",title:"HNRS 2011: BLS Sem in Human",room:"Brewster, 0D207",building:"brewster"},
+        {id:"thu-2",time:"12:30 PM – 01:45 PM",start:"12:30",end:"13:45",title:"BIOL 1100: Principles of Biology I",room:"Austin, 00205",building:"austin"}
+      ],
+      Friday:[{id:"fri-1",time:"09:00 AM – 09:50 AM",start:"09:00",end:"09:50",title:"CHEM 1150: General Chemistry I",room:"Sci & Tech, 0C307",building:"scitech"}]
+    };
+    const noClass = new Set(["2026-09-07","2026-10-05","2026-10-06","2026-11-25","2026-11-26","2026-11-27"]);
+    const state = { day:"", chosen:false, gps:null, gpsAt:0, watch:null, rain:false, notified:load("navNotified",{}), theme:load("classNavTheme","auto") };
+    function load(key,fallback){ try { const value=localStorage.getItem(key); return value?JSON.parse(value):fallback; } catch { return fallback; } }
+    function save(key,value){ try { localStorage.setItem(key,JSON.stringify(value)); } catch {} }
+    function ymd(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+    function at(time,date){ const [h,m]=time.split(":").map(Number); const d=new Date(date); d.setHours(h,m,0,0); return d; }
+    function clock(d){ return d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}); }
+    function dateLabel(d){ return d.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"}); }
+    function duration(seconds){ const t=Math.max(0,Math.floor(seconds)); const days=Math.floor(t/86400),h=Math.floor(t%86400/3600),m=Math.floor(t%3600/60),s=t%60; if(days)return `${days}d ${h}h ${m}m`; if(h)return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+    function feet(a,b,c,d){ const R=3958.8,dl=(c-a)*Math.PI/180,dn=(d-b)*Math.PI/180; const x=Math.sin(dl/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dn/2)**2; return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))*5280; }
+    function gpsFresh(){ return state.gps && Date.now()-state.gpsAt<180000; }
+    function gpsWalkTo(key){ const b=buildings[key]; const distance=feet(state.gps.lat,state.gps.lon,b.lat,b.lon); return Math.max(1,Math.ceil(distance*1.18/264)+(state.rain?3:0)); }
+    function campusWalk(from,to){ if(from===to)return 2; return (matrix[from]?.[to]??matrix[to]?.[from]??8)+(state.rain?3:0); }
+    function originFor(day,index){ if(index===0)return "greene"; const prior=schedule[day][index-1],current=schedule[day][index]; const gap=(Number(current.start.slice(0,2))*60+Number(current.start.slice(3)))-(Number(prior.end.slice(0,2))*60+Number(prior.end.slice(3))); return gap<=90?prior.building:"greene"; }
+    function travelFor(day,index,item){ if(item.route302)return {minutes:14,label:"Route 302 · 14 min ride"}; const isToday=day===DAYS[new Date().getDay()]; if(isToday&&gpsFresh()) { const m=gpsWalkTo(item.building); return {minutes:m,label:`${m} min from you`}; } const m=campusWalk(originFor(day,index),item.building); return {minutes:m,label:`${m} min walk`}; }
+    function selectedDate(day){ const now=new Date(),d=new Date(now),target=DAYS.indexOf(day); d.setDate(now.getDate()+((target-now.getDay()+7)%7)); return d; }
+    function isOff(d){ return d.getDay()===0||d.getDay()===6||noClass.has(ymd(d)); }
+    function todayDay(){ const d=DAYS[new Date().getDay()]; return schedule[d]?d:"Monday"; }
+    function nextClass(){ const now=new Date(); for(let offset=0;offset<14;offset++){ const d=new Date(now); d.setDate(now.getDate()+offset); d.setHours(0,0,0,0); if(isOff(d))continue; const day=DAYS[d.getDay()],items=schedule[day]||[]; for(let i=0;i<items.length;i++){ const start=at(items[i].start,d),end=at(items[i].end,d); if(offset===0&&now>end)continue; return {item:items[i],index:i,day,date:d,start,end}; } } return null; }
+    function busPlan(classStart){ const departure=new Date(classStart); departure.setMinutes(0,0,0); const arrival=new Date(departure.getTime()+14*60000); if(arrival>new Date(classStart.getTime()-10*60000))departure.setMinutes(departure.getMinutes()-30); const stopWalk=gpsFresh()?gpsWalkTo("studentcenter"):8; return {departure,arrival:new Date(departure.getTime()+14*60000),stopBy:new Date(departure.getTime()-5*60000),remind:new Date(departure.getTime()-(stopWalk+5)*60000),stopWalk}; }
+    function routeLink(key){ const destination=buildings[key].maps; const origin=gpsFresh()?`${state.gps.lat},${state.gps.lon}`:buildings.greene.maps; return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=walking`; }
+    function toast(message){ const el=document.getElementById("toast"); el.textContent=message; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),3800); }
+    function renderWeek(){ const now=new Date(),monday=new Date(now); monday.setDate(now.getDate()+(now.getDay()===0?-6:1-now.getDay())); document.getElementById("weekStrip").innerHTML=["Monday","Tuesday","Wednesday","Thursday","Friday"].map((day,i)=>{ const d=new Date(monday); d.setDate(monday.getDate()+i); return `<button class="${state.day===day?"active":""}" data-week="${day}"><small>${day.slice(0,3)}</small><strong>${d.getDate()}</strong></button>`; }).join(""); document.querySelectorAll("[data-week]").forEach(b=>b.onclick=()=>chooseDay(b.dataset.week)); }
+    function renderSchedule(){ const now=new Date(),items=schedule[state.day]||[],container=document.getElementById("scheduleContainer"); document.querySelectorAll("[data-day]").forEach(b=>b.classList.toggle("active",b.dataset.day===state.day)); if(!items.length){ container.innerHTML='<div class="empty">No classes scheduled.</div>'; return; } const d=selectedDate(state.day); container.innerHTML=items.map((item,index)=>{ const start=at(item.start,d),end=at(item.end,d),today=state.day===DAYS[now.getDay()],current=today&&now>=start&&now<=end,past=today&&now>end,travel=travelFor(state.day,index,item); const bus=item.route302?busPlan(start):null; return `<article class="class-card ${current?"current":""} ${past?"past":""}"><div class="card-top"><span class="time">${item.time}</span><span class="travel">${travel.label}</span></div>${current?'<span class="live">● In class</span>':""}<div class="class-title">${item.title}</div><div class="room">${item.room}</div>${bus?`<div class="bus-box"><strong>Take Route 302 at ${clock(bus.departure)}</strong><span>Main Campus Student Center · be there by ${clock(bus.stopBy)} · arrives Health Sciences about ${clock(bus.arrival)}</span></div>`:""}<div class="actions"><a class="action secondary" href="${routeLink(item.route302?"studentcenter":item.building)}" target="_blank" rel="noopener">${item.route302?"Walk to bus stop":"Open walking route"}</a>${item.route302?'<a class="action" href="https://transit.ecu.edu/bus-routes/route-302/" target="_blank" rel="noopener">Track Route 302</a>':""}</div></article>`; }).join(""); }
+    function renderStatus(){ const now=new Date(),next=nextClass(),card=document.getElementById("statusCard"),tag=document.getElementById("statusTag"),title=document.getElementById("statusTitle"),timer=document.getElementById("timer"),sub=document.getElementById("statusSub"),leave=document.getElementById("leaveRow"); card.classList.remove("leave"); if(!next){ tag.textContent="Schedule complete"; title.textContent="No remaining classes"; timer.textContent="—"; sub.textContent="Your current schedule has ended."; leave.hidden=true; return; } const active=now>=next.start&&now<=next.end; tag.textContent=active?"In class":next.item.route302?"Route 302 next":"Next class"; title.textContent=next.item.title; timer.textContent=duration(((active?next.end:next.start)-now)/1000); sub.textContent=active?`Ends at ${clock(next.end)} · ${next.item.room}`:`${ymd(next.date)===ymd(now)?"Today":dateLabel(next.date)} at ${clock(next.start)} · ${next.item.room}`; if(active){ leave.hidden=true; return; } leave.hidden=false; let remind,copy; if(next.item.route302){ const bus=busPlan(next.start); remind=bus.remind; copy=`Leave for Route 302 by ${clock(bus.remind)} · bus ${clock(bus.departure)}`; } else { const t=travelFor(next.day,next.index,next.item); remind=new Date(next.start.getTime()-t.minutes*60000); copy=`Leave by ${clock(remind)} · ${t.label}`; } leave.textContent=copy; if(now>=remind&&now<next.start)card.classList.add("leave"); maybeNotify(next,remind); }
+    async function showNotification(title,options){ try { const reg="serviceWorker" in navigator?await navigator.serviceWorker.getRegistration():null; if(reg)await reg.showNotification(title,options); else new Notification(title,options); } catch {} }
+    function maybeNotify(next,remind){ if(!("Notification" in window)||Notification.permission!=="granted")return; const key=`${ymd(next.start)}:${next.item.id}`; if(state.notified[key])return; const now=Date.now(); if(now>=remind.getTime()-30000&&now<=remind.getTime()+120000){ const body=next.item.route302?`Leave now for the Main Campus Student Center. Take Route 302 at ${clock(busPlan(next.start).departure)} for Survey of Health Professions.`:`Leave now for ${next.item.title} — ${next.item.room}`; showNotification("Class Navigator",{body,tag:key}); state.notified[key]=true; save("navNotified",state.notified); if(navigator.vibrate)navigator.vibrate([50,40,90]); } }
+    function chooseDay(day){ state.day=day; state.chosen=true; renderWeek(); renderSchedule(); }
+    function onPosition(position){ state.gps={lat:position.coords.latitude,lon:position.coords.longitude}; state.gpsAt=Date.now(); const nearest=Object.values(buildings).map(b=>({...b,d:feet(state.gps.lat,state.gps.lon,b.lat,b.lon)})).sort((a,b)=>a.d-b.d)[0]; document.getElementById("gpsStatus").textContent=nearest.d>1000?`${(nearest.d/5280).toFixed(1)} mi from ${nearest.label}`:`${Math.round(nearest.d)} ft from ${nearest.label}`; document.getElementById("locationBtn").textContent="Location is updating"; renderSchedule(); renderStatus(); }
+    function enableLocation(){ if(!navigator.geolocation){ toast("Location is not available in this browser."); return; } document.getElementById("gpsStatus").textContent="Finding you…"; navigator.geolocation.getCurrentPosition(onPosition,()=>{ document.getElementById("gpsStatus").textContent="Permission needed"; toast("Allow location access to update walking times."); },{enableHighAccuracy:true,timeout:12000,maximumAge:15000}); if(state.watch===null)state.watch=navigator.geolocation.watchPosition(onPosition,()=>{}, {enableHighAccuracy:true,maximumAge:20000,timeout:20000}); }
+    async function enableNotifications(){ if(!("Notification" in window)){ toast("Notifications are not available here. Use the calendar alert instead."); return; } const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; if(ios&&!standalone){ toast("On iPhone, add this site to Home Screen, then open it there to enable reminders."); return; } const permission=Notification.permission==="granted"?"granted":await Notification.requestPermission(); if(permission==="granted"){ document.getElementById("notifyBtn").textContent="Live reminders enabled"; toast("Live reminders enabled while the web app is running."); } else toast("Notification permission was not granted."); }
+    function firstDate(day){ const d=new Date(`${TERM_START}T09:00:00`),target=DAYS.indexOf(day); d.setDate(d.getDate()+((target-d.getDay()+7)%7)); return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`; }
+    function exportCalendar(){ const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Class Navigator//EN","CALSCALE:GREGORIAN","X-WR-CALNAME:ECU Classes"]; const codes={Monday:"MO",Tuesday:"TU",Wednesday:"WE",Thursday:"TH",Friday:"FR"}; Object.entries(schedule).forEach(([day,items])=>items.forEach((item,index)=>{ const d=firstDate(day),[sh,sm]=item.start.split(":"),[eh,em]=item.end.split(":"); lines.push("BEGIN:VEVENT",`UID:${day}-${index}@classnavigator`,`DTSTART:${d}T${sh}${sm}00`,`DTEND:${d}T${eh}${em}00`,`RRULE:FREQ=WEEKLY;BYDAY=${codes[day]};UNTIL=20261211T235959`,`SUMMARY:${item.title}`,`LOCATION:${item.room}`,"END:VEVENT"); if(item.route302)lines.push("BEGIN:VEVENT",`UID:route302-${day}@classnavigator`,`DTSTART:${d}T145500`,`DTEND:${d}T151500`,`RRULE:FREQ=WEEKLY;BYDAY=${codes[day]};UNTIL=20261211T235959`,`SUMMARY:Take Route 302 for Survey of Health Professions`,`LOCATION:Main Campus Student Center`,`DESCRIPTION:Board Route 302 at 3:00 PM. It reaches the Health Sciences Building at approximately 3:14 PM. Arrive at the stop 5 minutes early.`,`BEGIN:VALARM`,`TRIGGER:-PT5M`,`ACTION:DISPLAY`,`DESCRIPTION:Leave for Route 302 now`,`END:VALARM`,`END:VEVENT`); })); lines.push("END:VCALENDAR"); const blob=new Blob([lines.join("\r\n")],{type:"text/calendar"}),a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="ecu-class-navigator.ics"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); toast("Calendar downloaded with the Route 302 alert."); }
+    async function fetchWeather(){ try { const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.6127&longitude=-77.3663&current=temperature_2m,precipitation,weather_code&temperature_unit=fahrenheit&timezone=America%2FNew_York"),d=await r.json(),code=d.current.weather_code; state.rain=(d.current.precipitation||0)>0||(code>=51&&code<70)||(code>=80&&code<100); document.getElementById("weather").textContent=`${Math.round(d.current.temperature_2m)}°F · ${state.rain?"Rain":"Clear"}`; renderSchedule(); } catch { document.getElementById("weather").textContent="Unavailable"; } }
+    function applyTheme(){ const dark=state.theme==="auto"?matchMedia("(prefers-color-scheme:dark)").matches:state.theme==="dark"; document.documentElement.dataset.theme=dark?"dark":"light"; document.getElementById("themeColorMeta").content=dark?"#000000":"#f2f2f7"; }
+    function toggleTheme(){ state.theme=document.documentElement.dataset.theme==="dark"?"light":"dark"; save("classNavTheme",state.theme); applyTheme(); }
+    function start(){ state.day=todayDay(); document.getElementById("headerDate").textContent=dateLabel(new Date()); applyTheme(); renderWeek(); renderSchedule(); renderStatus(); fetchWeather(); document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>chooseDay(b.dataset.day)); document.getElementById("themeBtn").onclick=toggleTheme; document.getElementById("locationBtn").onclick=enableLocation; document.getElementById("notifyBtn").onclick=enableNotifications; document.getElementById("calendarBtn").onclick=exportCalendar; if(navigator.permissions)navigator.permissions.query({name:"geolocation"}).then(p=>{ if(p.state==="granted")enableLocation(); }).catch(()=>{}); if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{}); setInterval(renderStatus,1000); }
+    start();
+  </script>
+</body>
+</html>
